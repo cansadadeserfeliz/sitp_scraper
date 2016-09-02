@@ -1,7 +1,7 @@
 import scrapy
 
 
-class StackOverflowSpider(scrapy.Spider):
+class SITPSpider(scrapy.Spider):
     name = 'sitp'
     start_urls = ['http://www.sitp.gov.co/loader.php?lServicio=Rutas&lTipo=busqueda&lFuncion=mostrarRuta&tipoRuta=8']
 
