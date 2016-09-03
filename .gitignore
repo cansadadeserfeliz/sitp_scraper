@@ -3,4 +3,4 @@
 .idea/
 __pycache__/
 
-/sitp_scrapper/local_settings.py
+/sitp_scraper/local_settings.py
