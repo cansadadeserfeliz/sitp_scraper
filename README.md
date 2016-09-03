@@ -4,7 +4,13 @@
 
 ## Usage
 
+Run scrapy spider:
+
     scrapy runspider sitp_spider.py -o stip-urbano.json
+
+Run Django project:
+
+    python manage.py runserver
 
 ## Idea
 
