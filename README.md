@@ -6,7 +6,8 @@
 
 Run scrapy spider:
 
-    scrapy runspider sitp_spider.py -o stip-urbano.json
+    cd sitp_spider
+    scrapy crawl sitp
 
 Run Django project:
 
