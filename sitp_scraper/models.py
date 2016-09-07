@@ -19,7 +19,7 @@ class RouteStations(models.Model):
         choices=((1, 'Ida'), (2, 'Vuelta')),
     )
     position = models.PositiveIntegerField()
-    route = models.ForeignKey('sitp_scraper.Route', 
+    route = models.ForeignKey('sitp_scraper.Route',
                               related_name='route_stations')
     bus_station = models.ForeignKey('sitp_scraper.BusStation')
 
