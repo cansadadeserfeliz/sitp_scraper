@@ -6,24 +6,14 @@
 # http://doc.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from scrapy_djangoitem import DjangoItem
+
+from sitp_scraper.models import BusStation, Route
 
 
 class BusStationItem(scrapy.Item):
-    name = scrapy.Field()
-    code = scrapy.Field()
-    link = scrapy.Field()
-    address = scrapy.Field()
-    sublocality = scrapy.Field()
-    longitude = scrapy.Field()
-    latitude = scrapy.Field()
+    django_model = BusStation
 
 
 class RouteItem(scrapy.Item):
-    code = scrapy.Field()
-    name = scrapy.Field()
-    bus_type = scrapy.Field()
-    map_link = scrapy.Field()
-    schedule = scrapy.Field()
-    link = scrapy.Field()
-    route_1 = scrapy.Field()
-    route_2 = scrapy.Field()
+    django_model = Route
