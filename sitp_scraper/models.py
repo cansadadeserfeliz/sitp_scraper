@@ -15,8 +15,11 @@ class BusStation(models.Model):
 
 
 class RouteStations(models.Model):
+    DIRECTION_1 = 1
+    DIRECTION_2 = 2
+
     direction = models.PositiveSmallIntegerField(
-        choices=((1, 'Ida'), (2, 'Vuelta')),
+        choices=((DIRECTION_1, 'Ida'), (DIRECTION_2, 'Vuelta')),
     )
     position = models.PositiveIntegerField()
     route = models.ForeignKey('sitp_scraper.Route',
@@ -37,7 +40,7 @@ class Route(models.Model):
     code = models.CharField(max_length=30)
     route_type = models.PositiveSmallIntegerField(choices=ROUTE_TYPES)
     map_link = models.URLField(default='')
-    schedule = models.CharField(max_length=150)  # TODO: define format
+    schedule = models.CharField(max_length=500)
     link = models.URLField(default='')
 
     def __str__(self):
