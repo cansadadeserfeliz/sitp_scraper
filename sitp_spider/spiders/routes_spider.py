@@ -1,4 +1,3 @@
-import requests
 import scrapy
 
 from ..items import RouteItem, BusStationItem

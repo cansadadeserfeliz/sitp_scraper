@@ -8,6 +8,12 @@ Run scrapy spider:
 
     scrapy crawl sitp
 
+or
+
+    python manage.py start_scraper
+
+to run it from Django.
+
 Run Django project:
 
     python manage.py runserver
