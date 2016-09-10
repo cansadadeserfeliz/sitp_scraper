@@ -124,6 +124,6 @@ STATIC_URL = '/static/'
 
 
 if 'test' in sys.argv:
-    from sitp_scraper.test_settings import *
+    from .test_settings import *
 else:
-    from sitp_scraper.local_settings import *
+    from .local_settings import *
