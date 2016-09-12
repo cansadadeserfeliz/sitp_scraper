@@ -9,7 +9,10 @@ class Command(BaseCommand):
            'Google Geocoder API'
 
     def handle(self, *args, **options):
-        for bus_station in BusStation.objects.all():
+        for bus_station in BusStation.objects.filter(
+            latitude__isnull=True,
+            longitude__isnull=True,
+        ).all():
             print(bus_station.name, bus_station.address)
             try:
                 url = 'http://maps.googleapis.com/maps/api/geocode/json?' \
