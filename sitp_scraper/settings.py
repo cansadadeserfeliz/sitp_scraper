@@ -123,8 +123,17 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+try:
+    import dj_database_url
+    db_from_env = dj_database_url.config()
+    DATABASES['default'].update(db_from_env)
+except:
+    pass
 
-if 'test' in sys.argv:
-    from .test_settings import *
-else:
-    from .local_settings import *
+try:
+    if 'test' in sys.argv:
+        from .test_settings import *
+    else:
+        from .local_settings import *
+except:
+    pass

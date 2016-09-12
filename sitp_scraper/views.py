@@ -25,7 +25,7 @@ def get_routes(request):
               }
             })
 
-    route = Route.objects.get(code='544B')
+    route = Route.objects.get(code='801')
     bs_list = list(route.route_stations.filter(
         direction=RouteStations.DIRECTION_1,
     ).all())
