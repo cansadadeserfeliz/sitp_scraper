@@ -35,6 +35,8 @@ class RouteStations(models.Model):
 
 
 class Route(models.Model):
+    ROUTE_TYPE_URBAN = 8
+    ROUTE_TYPE_COMPLEMENTARY = 9
     ROUTE_TYPES = (
         (6, 'Troncal Sistema TransMilenio'),
         (7, 'Alimentadora'),
