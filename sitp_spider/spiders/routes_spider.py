@@ -10,12 +10,8 @@ class SITPSpider(scrapy.Spider):
     ]
 
     def parse(self, response):
-        count = 0
         for href in response.css('.containerInfoListRuta a::attr(href)'):
             full_url = response.urljoin(href.extract())
-            count += 1
-            if count > 2:
-                return
             yield scrapy.Request(full_url, callback=self.parse_route)
 
     @staticmethod
@@ -37,6 +33,7 @@ class SITPSpider(scrapy.Spider):
 
     def parse_route(self, response):
         route_item = RouteItem()
+        route_item['route_type'] = 8
         route_item['code'] = response.css('.codigoRuta::text').extract_first()
         route_item['name'] = \
             response.css('.rutaEstacionesNombre::text').extract_first().strip()

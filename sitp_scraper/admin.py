@@ -4,14 +4,15 @@ from .models import BusStation, RouteStations, Route
 
 @admin.register(BusStation)
 class BusStationAdmin(admin.ModelAdmin):
-    pass
+    search_fields = ('code', 'name', 'address')
+    list_display = ('name', 'code', 'address', 'longitude', 'latitude', 'created_at', 'updated_at')
 
 
 @admin.register(RouteStations)
 class RouteStationsAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('direction', 'route', 'position', 'bus_station', 'created_at', 'updated_at')
 
 
 @admin.register(Route)
 class RouteAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('code', 'name', 'route_type', 'created_at', 'updated_at')

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class BusStation(models.Model):
@@ -9,6 +10,9 @@ class BusStation(models.Model):
     sublocality = models.CharField(max_length=150, default='')
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -26,6 +30,9 @@ class RouteStations(models.Model):
                               related_name='route_stations')
     bus_station = models.ForeignKey('sitp_scraper.BusStation')
 
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
 
 class Route(models.Model):
     ROUTE_TYPES = (
@@ -42,6 +49,9 @@ class Route(models.Model):
     map_link = models.URLField(default='')
     schedule = models.CharField(max_length=500)
     link = models.URLField(default='')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name

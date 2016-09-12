@@ -8,3 +8,5 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoidmVybzRrYSIsImEiOiJjYWNlMWY0Zjk0MGJhNWRmNDIzNmVjNjc0NDRhMjllOCJ9.fRmHavGBvl6wWemwMZBbfA'
