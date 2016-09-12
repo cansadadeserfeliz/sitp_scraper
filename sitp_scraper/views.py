@@ -6,12 +6,14 @@ from .models import Route, BusStation, RouteStations
 def get_routes(request):
     features = []
     for bus_station in BusStation.objects.all():
+        print(bus_station, bus_station.longitude, bus_station.latitude)
         if bus_station.longitude and bus_station.latitude:
             features.append({
               "type": "Feature",
               "properties": {
-                "marker-color": "#f76565",
+                "marker-color": "#00608B",
                 "marker-symbol": "bus",
+                "marker-size": "small",
                 "title": bus_station.name
               },
               "geometry": {

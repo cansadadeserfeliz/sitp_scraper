@@ -15,4 +15,6 @@ class RouteStationsAdmin(admin.ModelAdmin):
 
 @admin.register(Route)
 class RouteAdmin(admin.ModelAdmin):
+    search_fields = ('code', 'name')
     list_display = ('code', 'name', 'route_type', 'created_at', 'updated_at')
+    ordering = ('code',)
