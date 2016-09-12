@@ -7,6 +7,7 @@ class SITPSpider(scrapy.Spider):
     name = 'sitp'
     start_urls = [
         'http://www.sitp.gov.co/loader.php?lServicio=Rutas&lTipo=busqueda&lFuncion=mostrarRuta&tipoRuta=8',
+        'http://www.sitp.gov.co/loader.php?lServicio=Rutas&lTipo=busqueda&lFuncion=mostrarRuta&tipoRuta=9',
     ]
 
     def parse(self, response):
@@ -33,7 +34,10 @@ class SITPSpider(scrapy.Spider):
 
     def parse_route(self, response):
         route_item = RouteItem()
-        route_item['route_type'] = 8
+        if 'tipoRuta=9' in response.url:
+            route_item['route_type'] = 9
+        else:
+            route_item['route_type'] = 8
         route_item['code'] = response.css('.codigoRuta::text').extract_first()
         route_item['name'] = \
             response.css('.rutaEstacionesNombre::text').extract_first().strip()

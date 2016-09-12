@@ -16,6 +16,10 @@ class SitpSpiderPipeline(object):
         station = BusStation.objects.filter(address=station_item['address']).first()
 
         if station:
+            # We'll get latitude and longitude from Google Maps
+            del station_item['latitude']
+            del station_item['longitude']
+
             BusStation.objects.filter(
                 address=station_item['address'],
             ).update(updated_at=timezone.now(), **station_item)
@@ -24,9 +28,7 @@ class SitpSpiderPipeline(object):
         return station
 
     def process_item(self, item, spider):
-        print('!'*1000)
         route = Route.objects.filter(code=item['code']).first()
-        print('ROUTE', route)
 
         route_1 = item['route_1']
         route_2 = item['route_1']
