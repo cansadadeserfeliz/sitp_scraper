@@ -18,6 +18,10 @@ Run Django project:
 
     python manage.py runserver
 
+# Get coordinates for bus stations using Google maps:
+
+    python manage.py get_station_coordinates
+
 ## Idea
 
 The idea is to make a map with all bus routes that would be easy to print.
