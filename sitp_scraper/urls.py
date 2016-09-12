@@ -17,11 +17,13 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 from django.contrib import admin
 
-from .views import get_routes
+from .views import get_routes, RouteListView, RouteDetailView
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='index.html'), name='index'),
-    url(r'^get_routes$', get_routes, name='get_routes'),
+    url(r'^routes/$', RouteListView.as_view(), name='route_list'),
+    url(r'^route/(?P<pk>\d+)/$', RouteDetailView.as_view(), name='route_detail'),
+    url(r'^get_routes/$', get_routes, name='get_routes'),
 
     url(r'^admin/', admin.site.urls),
 ]

@@ -31,7 +31,7 @@ class SitpSpiderPipeline(object):
         route = Route.objects.filter(code=item['code']).first()
 
         route_1 = item['route_1']
-        route_2 = item['route_1']
+        route_2 = item['route_2']
 
         del item['route_1']
         del item['route_2']
@@ -47,7 +47,7 @@ class SitpSpiderPipeline(object):
 
         for i, station_item in enumerate(route_1, start=1):
             RouteStations.objects.create(
-                direction=1,
+                direction=RouteStations.DIRECTION_1,
                 position=i,
                 bus_station=self.get_station(station_item),
                 route=route,
@@ -55,7 +55,7 @@ class SitpSpiderPipeline(object):
 
         for i, station_item in enumerate(route_2, start=1):
             RouteStations.objects.create(
-                direction=2,
+                direction=RouteStations.DIRECTION_2,
                 position=i,
                 bus_station_id=self.get_station(station_item).id,
                 route=route,

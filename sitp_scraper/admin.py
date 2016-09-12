@@ -17,7 +17,6 @@ class RouteStationsAdmin(admin.ModelAdmin):
 class RouteAdmin(admin.ModelAdmin):
     search_fields = ('code', 'name')
     list_display = ('code_display', 'name', 'route_type', 'created_at', 'updated_at')
-    ordering = ('code',)
 
     def code_display(self, obj):
         if obj.route_type == Route.ROUTE_TYPE_URBAN:

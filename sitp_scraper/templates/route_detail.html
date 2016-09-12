@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ object.code }}</h2>
+
+  <div class="row">
+    <div class="col-md-6">
+      <table class="table table-condensed">
+       <tbody>
+       {% for route_station in route_1 %}
+        <tr>
+          <td>{{ route_station.position }}</td>
+          <td>{{ route_station.get_direction_display }}</td>
+          <td>{{ route_station.bus_station.name }}</td>
+          <td>{{ route_station.bus_station.address }}</td>
+        </tr>
+       {% endfor %}
+       </tbody>
+      </table>
+    </div>
+    <div class="col-md-6">
+      <table class="table table-condensed">
+       <tbody>
+       {% for route_station in route_2 %}
+        <tr>
+          <td>{{ route_station.position }}</td>
+          <td>{{ route_station.get_direction_display }}</td>
+          <td>{{ route_station.bus_station.name }}</td>
+          <td>{{ route_station.bus_station.address }}</td>
+        </tr>
+       {% endfor %}
+       </tbody>
+      </table>
+    </div>
+  </div>
+
+{% endblock %}

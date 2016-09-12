@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <table class="table table-condensed">
+   <tbody>
+   {% for object in object_list %}
+    <tr>
+      <td><a href="{% url 'route_detail' object.id %}">{{ object.code }}</a></td>
+      <td>{{ object.name }}</td>
+      <td>{{ object.get_route_type_display }}</td>
+      <td>{{ object.updated_at }}</td>
+    </tr>
+   {% endfor %}
+   </tbody>
+  </table>
+{% endblock %}

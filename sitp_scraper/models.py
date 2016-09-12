@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 
 
 class BusStation(models.Model):
@@ -17,6 +16,9 @@ class BusStation(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['address']
+
 
 class RouteStations(models.Model):
     DIRECTION_1 = 1
@@ -32,6 +34,9 @@ class RouteStations(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['direction', 'position']
 
 
 class Route(models.Model):
@@ -57,3 +62,6 @@ class Route(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        ordering = ['code']
