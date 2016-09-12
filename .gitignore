@@ -2,6 +2,7 @@
 
 .idea/
 __pycache__/
+static/
 
 /sitp_scraper/local_settings.py
 stip-urbano.json
