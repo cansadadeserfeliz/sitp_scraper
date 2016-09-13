@@ -9,54 +9,68 @@ def get_routes(request):
     for bus_station in BusStation.objects.all():
         if bus_station.longitude and bus_station.latitude:
             features.append({
-              "type": "Feature",
-              "properties": {
-                "marker-color": "#00608B",
-                "marker-symbol": "bus",
-                "marker-size": "small",
-                "title": '{}: {}'.format(bus_station.name, bus_station.address)
-              },
-              "geometry": {
-                "type": "Point",
-                "coordinates": [
-                  bus_station.longitude,
-                  bus_station.latitude,
-                ]
-              }
-            })
-
-    route = Route.objects.get(code='801')
-    bs_list = list(route.route_stations.filter(
-        direction=RouteStations.DIRECTION_1,
-    ).all())
-    prev_bs = bs_list[0].bus_station
-    for bs in bs_list:
-        if not (prev_bs.longitude and prev_bs.latitude):
-            prev_bs = bs.bus_station
-            continue
-        if bs.bus_station.longitude and bs.bus_station.latitude:
-            features.append({
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'LineString',
-                    'coordinates': [
-                        [prev_bs.longitude,
-                         prev_bs.latitude],
-                        [bs.bus_station.longitude,
-                         bs.bus_station.latitude],
-                    ]
-                },
+                "type": "Feature",
                 'properties': {
-                    "stroke": "#ff8888",
-                    "stroke-opacity": 1,
-                    "stroke-width": 4,
+                    'title': '{}: {}'.format(bus_station.name, bus_station.address),
+                    'marker-color': "#00608B",
+                    'marker-size': 'small',
+                    'marker-symbol': 'bus',
+                },
+                "geometry": {
+                "type": "Point",
+                "coordinates": [bus_station.longitude, bus_station.latitude]
                 }
             })
-        prev_bs = bs.bus_station
-
     return JsonResponse({
       "type": "FeatureCollection",
       "features": features,
+    })
+
+
+def get_route(request, pk):
+    features = []
+    route = Route.objects.get(id=pk)
+    for bs in route.route_stations.all():
+        if bs.bus_station.longitude and bs.bus_station.latitude:
+            features.append({
+                "type": "Feature",
+                "properties": {
+                    "marker-color": "#00608B",
+                    "marker-symbol": "bus",
+                    "marker-size": "small",
+                    "title": '{}: {}'.format(bs.bus_station.name, bs.bus_station.address)
+                },
+                "geometry": {
+                    "type": "Point",
+                    "coordinates": [
+                        bs.bus_station.longitude,
+                        bs.bus_station.latitude,
+                    ]
+                }
+            })
+    bs_list = list(route.route_stations.filter(
+        bus_station__longitude__isnull=False,
+        bus_station__latitude__isnull=False,
+    ))
+    for bs1, bs2 in zip(bs_list[:-1], bs_list[1:]):
+        features.append({
+            'type': 'Feature',
+            'geometry': {
+                'type': 'LineString',
+                'coordinates': [
+                    [bs1.bus_station.longitude, bs1.bus_station.latitude],
+                    [bs2.bus_station.longitude, bs2.bus_station.latitude]
+                ]
+            },
+            'properties': {
+                "stroke": "#ff8888",
+                "stroke-opacity": 1,
+                "stroke-width": 4,
+            }
+        })
+    return JsonResponse({
+        "type": "FeatureCollection",
+        "features": features,
     })
 
 
