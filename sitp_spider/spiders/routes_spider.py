@@ -8,6 +8,7 @@ class SITPSpider(scrapy.Spider):
     start_urls = [
         'http://www.sitp.gov.co/loader.php?lServicio=Rutas&lTipo=busqueda&lFuncion=mostrarRuta&tipoRuta=8',
         'http://www.sitp.gov.co/loader.php?lServicio=Rutas&lTipo=busqueda&lFuncion=mostrarRuta&tipoRuta=9',
+        'http://www.sitp.gov.co/loader.php?lServicio=Rutas&lTipo=busqueda&lFuncion=mostrarRuta&tipoRuta=10',
     ]
 
     def parse(self, response):
@@ -26,6 +27,9 @@ class SITPSpider(scrapy.Spider):
                 station_info.css('.estDireccion::text').extract_first().strip()
             station_item['address'] = address
             station_item['sublocality'] = ''
+            link = station_info.css('.estNombre a::attr(href)').extract()
+            link = link[0] if type(link) == list else ''
+            station_item['link'] = link
             station_item['latitude'] = None
             station_item['longitude'] = None
 
@@ -36,6 +40,8 @@ class SITPSpider(scrapy.Spider):
         route_item = RouteItem()
         if 'tipoRuta=9' in response.url:
             route_item['route_type'] = 9
+        elif 'tipoRuta=10' in response.url:
+            route_item['route_type'] = 10
         else:
             route_item['route_type'] = 8
         route_item['code'] = response.css('.codigoRuta::text').extract_first()
