@@ -30,7 +30,8 @@ class RouteStations(models.Model):
     position = models.PositiveIntegerField()
     route = models.ForeignKey('sitp_scraper.Route',
                               related_name='route_stations')
-    bus_station = models.ForeignKey('sitp_scraper.BusStation')
+    bus_station = models.ForeignKey(
+        'sitp_scraper.BusStation', related_name='route_stations')
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

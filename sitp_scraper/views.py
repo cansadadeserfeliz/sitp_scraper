@@ -6,12 +6,19 @@ from .models import Route, BusStation, RouteStations
 
 def get_routes(request):
     features = []
-    for bus_station in BusStation.objects.all():
+    for bus_station in BusStation.objects.prefetch_related('route_stations').all():
         if bus_station.longitude and bus_station.latitude:
+            routes = set(bus_station.route_stations.values_list(
+                'route__code', flat=True,
+            ))
             features.append({
                 "type": "Feature",
                 'properties': {
-                    'title': '{}: {}'.format(bus_station.name, bus_station.address),
+                    'title': '{}: {} ({})'.format(
+                        bus_station.name,
+                        bus_station.address,
+                        ', '.join(routes)
+                    ),
                     'marker-color': "#00608B",
                     'marker-size': 'small',
                     'marker-symbol': 'bus',
