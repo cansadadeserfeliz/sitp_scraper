@@ -10,11 +10,17 @@ class BusStation(models.Model):
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
 
+    related_stations = models.ManyToManyField('self', blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+
+    @staticmethod
+    def autocomplete_search_fields():
+        return ('code__iexact', 'name__icontains',)
 
     class Meta:
         ordering = ['address']

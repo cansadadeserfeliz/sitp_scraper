@@ -17,8 +17,6 @@ class Command(BaseCommand):
                 print('\t', response.status_code)
                 if response.status_code == 200:
                     response_text = response.text
-                    is_combined_station = 'de un paradero m' in response_text
-                    print(is_combined_station)
                     res = Selector(text=response_text).css(
                         '#zonaBloqueContent h3::text').extract_first()
                     if not res:
@@ -36,7 +34,12 @@ class Command(BaseCommand):
                             '.codigoParadero::text').extract_first()
                         station = BusStation.objects.filter(
                             code=other_station_code).first()
-                        if station:
+                        if station and station.id != bus_station.id:
+                            if station not in bus_station.related_stations.all():
+                                bus_station.related_stations.add(station)
+                            if bus_station not in station.related_stations.all():
+                                station.related_stations.add(bus_station)
+
                             if (
                                 station.latitude and station.longitude
                                 and not bus_station.latitude
