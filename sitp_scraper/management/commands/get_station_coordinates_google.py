@@ -37,6 +37,7 @@ class Command(BaseCommand):
 
                             bus_station.latitude = result['geometry']['location']['lat']
                             bus_station.longitude = result['geometry']['location']['lng']
+                            bus_station.source = 'google'
                         print('\t', (bus_station.latitude, bus_station.longitude))
                         bus_station.save()
                         self.stdout.write(self.style.SUCCESS(

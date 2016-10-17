@@ -9,6 +9,7 @@ class BusStation(models.Model):
     sublocality = models.CharField(max_length=150, default='', blank=True)
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
+    source = models.CharField(max_length=30, default='', blank=True)
 
     related_stations = models.ManyToManyField('self', blank=True)
 

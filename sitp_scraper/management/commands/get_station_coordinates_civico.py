@@ -34,6 +34,7 @@ class Command(BaseCommand):
                             bus_station.longitude = address['coordinates'][0]
                             bus_station.latitude = address['coordinates'][1]
                             print('\t', bus_station.longitude, bus_station.latitude)
+                            bus_station.source = 'civico'
                             bus_station.save()
                             self.stdout.write(self.style.SUCCESS(
                                 '\t Bus stations coordinate were successfully updated'

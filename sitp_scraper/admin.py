@@ -16,7 +16,7 @@ class BusStationAdmin(admin.ModelAdmin):
         'address', 'sublocality',
         'longitude', 'latitude',
         'created_at', 'updated_at',
-        'sitp_url',
+        'source', 'sitp_url',
     )
 
     inlines = [
@@ -68,6 +68,11 @@ class RouteStationsAdmin(admin.ModelAdmin):
         'direction', 'route', 'position', 'bus_station',
         'created_at', 'updated_at'
     )
+
+    raw_id_fields = ('bus_station', 'route',)
+    related_lookup_fields = {
+        'fk': ['bus_station', 'route'],
+    }
 
 
 @admin.register(Route)
