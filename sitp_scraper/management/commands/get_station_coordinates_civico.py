@@ -10,10 +10,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for bus_station in BusStation.objects.filter(
-            #latitude__isnull=True,
-            #longitude__isnull=True,
-            #code__isnull=False,
-            code='270A02',
+            latitude__isnull=True,
+            longitude__isnull=True,
+            code__isnull=False,
         ).all():
             print(bus_station.name, bus_station.address, bus_station.code)
             try:
