@@ -4,6 +4,10 @@ from django.utils.html import mark_safe
 from .models import BusStation, RouteStations, Route
 
 
+class RouteStationsInline(admin.TabularInline):
+    model = RouteStations
+
+
 @admin.register(BusStation)
 class BusStationAdmin(admin.ModelAdmin):
     search_fields = ('code', 'name', 'address')
@@ -14,6 +18,10 @@ class BusStationAdmin(admin.ModelAdmin):
         'created_at', 'updated_at',
         'sitp_url',
     )
+
+    inlines = [
+        RouteStationsInline,
+    ]
 
     raw_id_fields = ('related_stations',)
     related_lookup_fields = {

@@ -6,7 +6,7 @@ class BusStation(models.Model):
     code = models.CharField(max_length=30)
     link = models.URLField(default='')
     address = models.CharField(max_length=255)
-    sublocality = models.CharField(max_length=150, default='')
+    sublocality = models.CharField(max_length=150, default='', blank=True)
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
 
@@ -69,7 +69,7 @@ class Route(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return self.code
 
     class Meta:
         ordering = ['code']

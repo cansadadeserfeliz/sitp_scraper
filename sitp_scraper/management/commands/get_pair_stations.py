@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = 'Finds composed stations'
 
     def handle(self, *args, **options):
-        for bus_station in BusStation.objects.all():
+        for bus_station in BusStation.objects.filter(code__isnull=True).all():
             print(bus_station.name, bus_station.address, bus_station.link)
             try:
                 response = requests.get(bus_station.link)
