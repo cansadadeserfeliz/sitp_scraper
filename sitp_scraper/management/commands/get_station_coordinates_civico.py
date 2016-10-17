@@ -10,9 +10,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for bus_station in BusStation.objects.filter(
-            latitude__isnull=True,
-            longitude__isnull=True,
-            code__isnull=False,
+            #latitude__isnull=True,
+            #longitude__isnull=True,
+            #code__isnull=False,
+            code='270A02',
         ).all():
             print(bus_station.name, bus_station.address, bus_station.code)
             try:
@@ -25,13 +26,15 @@ class Command(BaseCommand):
                 print('\t', response.status_code)
                 if response.status_code == 200:
                     response = response.json()
-                    print('\t', response)
                     if response.get('entities'):
                         for entity in response['entities']:
                             if 'SITP' not in entity['name']:
                                 continue
-                            bus_station.longitude = int(entity['address']['coordinates'][0])
-                            bus_station.latitude = int(entity['address']['coordinates'][1])
+                            address = entity['address'][0]
+                            print('\t', address)
+                            bus_station.longitude = address['coordinates'][0]
+                            bus_station.latitude = address['coordinates'][1]
+                            print('\t', bus_station.longitude, bus_station.latitude)
                             bus_station.save()
                             self.stdout.write(self.style.SUCCESS(
                                 '\t Bus stations coordinate were successfully updated'
