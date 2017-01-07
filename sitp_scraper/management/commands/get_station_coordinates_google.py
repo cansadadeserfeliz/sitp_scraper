@@ -39,10 +39,11 @@ class Command(BaseCommand):
                             bus_station.longitude = result['geometry']['location']['lng']
                             bus_station.source = 'google'
                         print('\t', (bus_station.latitude, bus_station.longitude))
-                        bus_station.save()
-                        self.stdout.write(self.style.SUCCESS(
-                            '\t Bus stations coordinate were successfully updated'
-                        ))
+                        if bus_station.latitude and bus_station.longitude:
+                            bus_station.save()
+                            self.stdout.write(self.style.SUCCESS(
+                                '\t Bus stations coordinate were successfully updated'
+                            ))
                         continue
             except Exception as e:
                 print(bus_station.id, e)
