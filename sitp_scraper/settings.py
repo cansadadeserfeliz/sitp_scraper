@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'sitp_scraper',
+    'sitp_bot',
 ]
 
 MIDDLEWARE = [
@@ -124,6 +125,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN', '')
 
 try:
     import dj_database_url

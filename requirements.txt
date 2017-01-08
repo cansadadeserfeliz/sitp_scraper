@@ -5,10 +5,13 @@ Django==1.10.1
 django-grappelli==2.8.2
 geopy==1.11.0
 ipython==5.1.0
+#pyTelegramBotAPI==2.3.0
+python-telegram-bot==5.3.0
 psycopg2==2.6.2
 requests==2.11.1
 Scrapy==1.1.2
 scrapy-djangoitem==1.1.1
+telepot==10.4
 
 # Heroku libs
 dj-database-url==0.4.1

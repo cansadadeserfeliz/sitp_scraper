@@ -26,6 +26,9 @@ urlpatterns = [
     url(r'^get_routes/$', get_routes, name='get_routes'),
     url(r'^get_route/(?P<pk>\d+)/$', get_route, name='get_route'),
 
+    # Telegram bot
+    url(r'^bot/', include('sitp_bot.urls', namespace='bot')),
+
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^admin/', admin.site.urls),
 ]
