@@ -1,6 +1,7 @@
 import json
 import logging
 import telepot
+from geopy.distance import great_circle
 
 from django.views.generic import View
 from django.http import JsonResponse, HttpResponseForbidden, HttpResponseBadRequest
@@ -60,6 +61,34 @@ class CommandReceiveView(View):
             EMOJI_CODES=EMOJI_CODES,
         ))
 
+    def display_nearest_bus_station(self, location):
+        min_latitude = 0.01
+        min_longitude = 0.01
+        bus_stations = {
+            bs.code: (bs.latitude, bs.longitude)
+            for bs in BusStation.objects.filter(
+                latitude__gte=location['latitude'] - min_latitude,
+                latitude__lte=location['latitude'] + min_latitude,
+                longitude__gte=location['longitude'] - min_longitude,
+                longitude__lte=location['longitude'] + min_longitude,
+            )
+        }
+
+        def distance(x, y):
+            return great_circle(x, y).miles
+
+        nearest = min(
+            bus_stations.values(),
+            key=lambda x: distance(
+                x,
+                (location['latitude'], location['longitude'])
+            )
+        )
+        return self.display_bus_station_info(BusStation.objects.filter(
+            latitude=nearest[0],
+            longitude=nearest[1],
+        ).first().code)
+
     def post(self, request, bot_token):
         if bot_token != settings.TELEGRAM_TOKEN:
             return HttpResponseForbidden('Invalid token')
@@ -75,53 +104,63 @@ class CommandReceiveView(View):
             )
         except ValueError:
             return HttpResponseBadRequest('Invalid request body')
-        else:
-            chat_id = payload['message']['chat']['id']
-            text = payload['message'].get('text')
-            words = text.split()
-            cmd = words[0].lower()
 
-            if cmd == '/start':
+        response = JsonResponse({}, status=200)
+        chat_id = payload['message']['chat']['id']
+
+        location = payload['message'].get('location')
+        if location:
+            TelegramBot.sendMessage(
+                chat_id,
+                self.display_nearest_bus_station(location),
+                parse_mode='Markdown')
+            return response
+
+        text = payload['message'].get('text')
+        words = text.split()
+        cmd = words[0].lower()
+
+        if cmd == '/start':
+            TelegramBot.sendMessage(
+                chat_id,
+                self.display_help(first_name),
+                parse_mode='Markdown')
+        elif cmd == '/help':
+            TelegramBot.sendMessage(
+                chat_id,
+                self.display_help(first_name),
+                parse_mode='Markdown')
+        elif cmd == '/bus':
+            if len(words) != 2:
                 TelegramBot.sendMessage(
                     chat_id,
-                    self.display_help(first_name),
-                    parse_mode='Markdown')
-            elif cmd == '/help':
-                TelegramBot.sendMessage(
-                    chat_id,
-                    self.display_help(first_name),
-                    parse_mode='Markdown')
-            elif cmd == '/bus':
-                if len(words) != 2:
-                    TelegramBot.sendMessage(
-                        chat_id,
-                        'Tienes que escribir el número de la ruta. '
-                        'Por ejemplo, /bus 18-2')
-                else:
-                    TelegramBot.sendMessage(
-                        chat_id,
-                        self.display_bus_info(words[1]),
-                        parse_mode='Markdown')
-            elif cmd == '/parada':
-                if len(words) != 2:
-                    TelegramBot.sendMessage(
-                        chat_id,
-                        'Tienes que escribir el número de la parada. '
-                        'Por ejemplo, /parada 216B00')
-                else:
-                    TelegramBot.sendMessage(
-                        chat_id,
-                        self.display_bus_station_info(words[1]),
-                        parse_mode='Markdown')
+                    'Tienes que escribir el número de la ruta. '
+                    'Por ejemplo, /bus 18-2')
             else:
                 TelegramBot.sendMessage(
                     chat_id,
-                    'No te entiendo {} '
-                    'Escribe /help para saber cómo hablar conmigo'.format(
-                        EMOJI_CODES['confused_face']
-                    )
+                    self.display_bus_info(words[1]),
+                    parse_mode='Markdown')
+        elif cmd == '/parada':
+            if len(words) != 2:
+                TelegramBot.sendMessage(
+                    chat_id,
+                    'Tienes que escribir el número de la parada. '
+                    'Por ejemplo, /parada 216B00')
+            else:
+                TelegramBot.sendMessage(
+                    chat_id,
+                    self.display_bus_station_info(words[1]),
+                    parse_mode='Markdown')
+        else:
+            TelegramBot.sendMessage(
+                chat_id,
+                'No te entiendo {} '
+                'Escribe /help para saber cómo hablar conmigo'.format(
+                    EMOJI_CODES['confused_face']
                 )
+            )
 
-        return JsonResponse({}, status=200)
+        return response
 
 
