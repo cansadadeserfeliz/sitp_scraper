@@ -52,7 +52,7 @@ class CommandReceiveView(View):
 
         try:
             payload = json.loads(raw)
-            logger.info('Bot request', extra=raw)
+            logger.info('Bot request', extra=payload)
         except ValueError:
             return HttpResponseBadRequest('Invalid request body')
         else:
