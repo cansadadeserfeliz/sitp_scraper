@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 import sys
-import raven
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,8 +40,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'raven.contrib.django.raven_compat',
 
     'sitp_scraper',
     'sitp_bot',
@@ -143,35 +140,23 @@ LOGGING = {
             'level': 'INFO',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
-        },
-        'sentry': {
-            'level': 'INFO',
-            'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-            'tags': {'custom-tag': 'x'},
-        },
+        }
     },
     'loggers': {
         'django': {
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            'handlers': ['sentry', 'console'],
+            'handlers': ['console'],
             'propagate': False,
         },
         'telegram.bot': {
             'level': 'DEBUG',
-            'handlers': ['sentry', 'console'],
+            'handlers': ['console'],
             'propagate': False,
         },
     },
 }
 
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN', '')
-
-RAVEN_CONFIG = {
-    'dsn': os.getenv('SENTRY_URL', ''),
-    # If you are using git, you can also automatically configure the
-    # release based on the git info.
-    'release': raven.fetch_git_sha(os.path.dirname(os.pardir)),
-}
 
 try:
     import dj_database_url
