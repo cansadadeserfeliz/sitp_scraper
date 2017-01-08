@@ -9,7 +9,7 @@
 
 ## Usage
 
-Run scrapy spider:
+Run scrapy spider to get new SITP stations and routes from www.sitp.gov.co website:
 
     scrapy crawl sitp
 
@@ -23,9 +23,19 @@ Run Django project:
 
     python manage.py runserver
 
-# Get coordinates for bus stations using Google maps:
+### Get coordinates for bus stations from Google maps API:
 
-    python manage.py get_station_coordinates
+    python manage.py get_station_coordinates_google
+
+### Get coordinates for bus stations from Civico:
+
+    python manage.py get_station_coordinates_civico
+
+### Get pair stations form www.sitp.gov.co website
+
+"Pair stations" are stations that are located really close so we can count them as one.
+
+    python manage.py get_pair_stations
 
 ## Idea
 
