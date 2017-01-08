@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'debug_toolbar',
     'raven.contrib.django.raven_compat',
 
     'sitp_scraper',
@@ -56,6 +57,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'sitp_scraper.urls'
@@ -132,6 +135,9 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static',),
 )
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+# Debug Toolbar
+DEBUG_TOOLBAR_PATCH_SETTINGS = False
 
 LOGGING = {
     'version': 1,
