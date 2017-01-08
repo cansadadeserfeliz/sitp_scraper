@@ -10,7 +10,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from sitp_scraper.models import Route, RouteStations
-from .utils import EMOJI_CODES
+from sitp_bot.utils import EMOJI_CODES
 
 
 TelegramBot = telepot.Bot(settings.TELEGRAM_TOKEN)
@@ -85,8 +85,10 @@ class CommandReceiveView(View):
             else:
                 TelegramBot.sendMessage(
                     chat_id,
-                    'No te entiendo :/ '
-                    'Escribe /help para saber cómo hablar conmigo'
+                    'No te entiendo {} '
+                    'Escribe /help para saber cómo hablar conmigo'.format(
+                        EMOJI_CODES['confused_face']
+                    )
                 )
 
         return JsonResponse({}, status=200)
