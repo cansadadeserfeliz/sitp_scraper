@@ -2,6 +2,9 @@ language: python
 python:
   - "3.5"
 
+before_install:
+  - export DJANGO_SETTINGS_MODULE=sitp_scraper.settings
+
 install:
   - "pip install -r requirements.txt"
   - "pip install coveralls"
