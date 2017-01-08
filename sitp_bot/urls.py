@@ -6,7 +6,7 @@ from .views import CommandReceiveView
 
 urlpatterns = [
     url(
-        r'^$',
+        r'(?P<bot_token>.+)/$',
         CommandReceiveView.as_view(),
         name='index',
     ),
