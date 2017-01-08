@@ -3,6 +3,7 @@
 .idea/
 __pycache__/
 static/
+staticfiles/
 
 /sitp_scraper/local_settings.py
 stip-urbano.json
