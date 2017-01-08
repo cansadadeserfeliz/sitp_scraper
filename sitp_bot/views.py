@@ -10,6 +10,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 
 from sitp_scraper.models import Route, RouteStations
+from .utils import EMOJI_CODES
 
 
 TelegramBot = telepot.Bot(settings.TELEGRAM_TOKEN)
@@ -25,21 +26,23 @@ class CommandReceiveView(View):
     def display_help(self, first_name):
         return render_to_string('bot/help.html', dict(
             first_name=first_name,
+            EMOJI_CODES=EMOJI_CODES,
         ))
 
     def display_bus_info(self, route_code):
         route = Route.objects.filter(code__iexact=route_code).first()
         if not route:
-            return 'No conozco esa ruta :('
-        return render_to_string('bot/bus_info.html', {
-            'route': route,
-            #'route_1': route.route_stations.filter(
+            return 'No conozco esa ruta {}'.format(EMOJI_CODES['disappointed'])
+        return render_to_string('bot/bus_info.html', dict(
+            route=route,
+            #route_1=route.route_stations.filter(
             #    direction=RouteStations.DIRECTION_1,
             #).all(),
-            #'route_2': route.route_stations.filter(
+            #route_2=route.route_stations.filter(
             #    direction=RouteStations.DIRECTION_2,
             #).all(),
-        })
+            EMOJI_CODES=EMOJI_CODES,
+        ))
 
     def post(self, request, bot_token):
         if bot_token != settings.TELEGRAM_TOKEN:
