@@ -76,7 +76,7 @@ class CommandReceiveView(View):
                 if len(words) != 2:
                     TelegramBot.sendMessage(
                         chat_id,
-                        'Tienes que escribir el número de la ruta.'
+                        'Tienes que escribir el número de la ruta. '
                         'Por ejemplo, /bus 18-2')
                 else:
                     TelegramBot.sendMessage(
