@@ -1,5 +1,4 @@
-*{{ route.code }}* es una ruta {{ route.get_route_type_display }}.
-
-{% if route.schedule %}Horario: {{ route.schedule|safe }}{% endif %}
+{{ EMOJI_CODES.oncoming_bus }} *{{ route.code }}* es una ruta {{ route.get_route_type_display }}.
+{% if route.schedule %}{{ EMOJI_CODES.clock_face_ten_o_clock }} {{ route.schedule|safe }}{% endif %}
 
 [Aquí]({{ route.map_link }}) puedes encontrar el mapa de la ruta.
