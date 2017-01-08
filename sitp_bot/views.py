@@ -49,10 +49,10 @@ class CommandReceiveView(View):
             return HttpResponseForbidden('Invalid token')
 
         raw = request.body.decode('utf-8')
-        logger.info(raw)
 
         try:
             payload = json.loads(raw)
+            logger.info('Bot request', extra=raw)
         except ValueError:
             return HttpResponseBadRequest('Invalid request body')
         else:
