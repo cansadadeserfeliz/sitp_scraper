@@ -14,7 +14,7 @@ class BusStationAdmin(admin.ModelAdmin):
     list_display = (
         'name', 'code',
         'address', 'sublocality',
-        'longitude', 'latitude',
+        'longitude', 'latitude', 'location_status',
         'created_at', 'updated_at',
         'source', 'sitp_url',
     )
@@ -37,7 +37,7 @@ class BusStationAdmin(admin.ModelAdmin):
         }),
         ('Map', {
             'description': '<div id="map"></div>',
-            'fields': ('longitude', 'latitude'),
+            'fields': ('longitude', 'latitude', 'location_status'),
         }),
         ('SITP', {
             'fields': (('related_stations',), ('link',)),

@@ -131,9 +131,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR.child('staticfiles')
+STATIC_ROOT = BASE_DIR.child('static')
 STATICFILES_DIRS = (
-    BASE_DIR.child('static'),
+    BASE_DIR.child('sitp_scraper', 'static'),
 )
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 

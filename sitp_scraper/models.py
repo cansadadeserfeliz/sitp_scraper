@@ -2,11 +2,23 @@ from django.db import models
 
 
 class BusStation(models.Model):
+    LOCATION_VERIFIED = 1
+    LOCATION_PENDING = 2
+    LOCATION_WRONG = 3
+
     name = models.CharField(max_length=150)
     code = models.CharField(max_length=30)
     link = models.URLField(default='')
     address = models.CharField(max_length=255)
     sublocality = models.CharField(max_length=150, default='', blank=True)
+    location_status = models.PositiveSmallIntegerField(
+        choices=(
+            (LOCATION_VERIFIED, 'Correcto'),
+            (LOCATION_PENDING, 'Por validar'),
+            (LOCATION_WRONG, 'Incorrecto'),
+        ),
+        default=LOCATION_PENDING,
+    )
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     source = models.CharField(max_length=30, default='', blank=True)
