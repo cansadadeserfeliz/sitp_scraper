@@ -29,7 +29,11 @@ class SITPSpider(scrapy.Spider):
             station_item['sublocality'] = ''
             link = station_info.css('.estNombre a::attr(href)').extract()
             link = link[0] if type(link) == list else ''
+            code = ''
+            if link:
+                code = link.split('/')[-1].split('_')[0]
             station_item['link'] = link
+            station_item['code'] = code
             station_item['latitude'] = None
             station_item['longitude'] = None
 
@@ -44,12 +48,18 @@ class SITPSpider(scrapy.Spider):
             route_item['route_type'] = 10
         else:
             route_item['route_type'] = 8
+
         route_item['code'] = response.css('.codigoRuta::text').extract_first()
-        route_item['name'] = \
-            response.css('.rutaEstacionesNombre::text').extract_first().strip()
-        route_item['map_link'] = 'http://www.sitp.gov.co{}'.format(
-                response.css('.linkMapaRuta::attr(href)').extract_first()
-            )
+
+        name = response.css('.rutaEstacionesNombre::text').extract_first() or ''
+        route_item['name'] = name.strip()
+
+        map_relative_link = \
+            response.css('.linkMapaRuta::attr(href)').extract_first()
+        route_item['map_link'] = \
+            'http://www.sitp.gov.co{}'.format(map_relative_link) \
+            if map_relative_link else ''
+
         route_item['schedule'] = [
             s.replace(' ', '') for s in
             response.css('.horarioFuncionamiento .label-horario::text').extract()

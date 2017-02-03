@@ -20,9 +20,15 @@ class SitpSpiderPipeline(object):
             del station_item['latitude']
             del station_item['longitude']
 
-            BusStation.objects.filter(
-                address=station_item['address'],
-            ).update(updated_at=timezone.now(), **station_item)
+            if not station_item['code']:
+                del station_item['code']
+                BusStation.objects.filter(
+                    address=station_item['address'],
+                ).update(updated_at=timezone.now(), **station_item)
+            else:
+                BusStation.objects.filter(
+                    code__iexact=station_item['code'],
+                ).update(updated_at=timezone.now(), **station_item)
         else:
             station = station_item.save()
         return station
