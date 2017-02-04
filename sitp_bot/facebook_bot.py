@@ -2,7 +2,28 @@ import requests
 import logging
 from django.conf import settings
 
-logger = logging.getLogger('bots')
+logger = logging.getLogger('facebook.bot')
+
+
+def get_user_info(user_id):
+    response = requests.get(
+        'https://graph.facebook.com/v2.6/{user_id}'
+        '?fields=first_name,last_name,profile_pic,locale,timezone,gender'
+        '&access_token={access_token}'.format(
+            user_id=user_id,
+            access_token=settings.FACEBOOK_PAGE_ACCESS_TOKEN,
+        )
+    )
+    user_info = response.json()
+    logger.info('FB user', extra=user_info)
+    #{
+    #   "first_name": "Pepito",
+    #   "last_name": "Perez",
+    #   "profile_pic": "",
+    #   "locale": "en_GB",
+    #   "timezone": -5,
+    #   "gender": "female"
+    #}
 
 
 def call_send_api(message_data):

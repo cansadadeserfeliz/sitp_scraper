@@ -16,7 +16,8 @@ from sitp_bot.utils import EMOJI_CODES
 
 
 TelegramBot = telepot.Bot(settings.TELEGRAM_TOKEN)
-logger = logging.getLogger('telegram.bot')
+telegram_logger = logging.getLogger('telegram.bot')
+facebook_logger = logging.getLogger('facebook.bot')
 
 
 class CommandReceiveView(View):
@@ -107,7 +108,7 @@ class CommandReceiveView(View):
         try:
             payload = json.loads(raw)
             first_name = payload['message']['from'].get('first_name', '')
-            logger.info(
+            telegram_logger.info(
                 'Bot request from {}'.format(first_name),
                 extra={'data': payload}
             )
@@ -183,7 +184,7 @@ class FacebookCommandReceiveView(View):
             return HttpResponseForbidden('Invalid token')
 
         data = json.loads(request.body.decode('utf-8'))
-        logger.info('FB bot', extra={'data': data})
+        facebook_logger.info('FB bot', extra={'data': data})
 
         # Make sure this is a page subscription
         if data['object'] == 'page':
@@ -200,15 +201,15 @@ class FacebookCommandReceiveView(View):
                         pass
                         #logger.info('FB. Message read: {}'.format(event))
                     elif event.get('postback'):
-                        logger.info('FB. Message is postback: {}'.format(event))
+                        facebook_logger.info('FB. Message is postback: {}'.format(event))
                     elif event.get('optin'):
-                        logger.info('FB. Message is optin: {}'.format(event))
+                        facebook_logger.info('FB. Message is optin: {}'.format(event))
                     elif event.get('referral'):
-                        logger.info('FB. Message is referral: {}'.format(event))
+                        facebook_logger.info('FB. Message is referral: {}'.format(event))
                     elif event.get('account_linking'):
-                        logger.info('FB. Message is account linking: {}'.format(event))
+                        facebook_logger.info('FB. Message is account linking: {}'.format(event))
                     else:
-                        logger.info('Webhook received unknown event: {}'.format(event))
+                        facebook_logger.info('Webhook received unknown event: {}'.format(event))
 
         # Assume all went well.
         # You must send back a 200, within 20 seconds, to let us know
