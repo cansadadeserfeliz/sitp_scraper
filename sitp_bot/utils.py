@@ -1,5 +1,4 @@
 import requests
-from transliterate import translit
 
 from django.conf import settings
 from django.utils import timezone
@@ -42,12 +41,13 @@ def save_bot_user(source, chat_user_id, user_info={}):
     )
     if source == SOURCE_FACEBOOK:
         user_info = get_facebook_user_info(chat_user_id)
-        # It can be Facebook user or Facebook page
-        bot_user.first_name = \
-            user_info.get('first_name', '') or user_info.get('name', '')
-        bot_user.last_name = user_info.get('last_name', '')
-        bot_user.timezone = user_info.get('timezone', None)
-        bot_user.locale = user_info.get('locale', '')
+
+    # It can be Facebook user or Facebook page
+    bot_user.first_name = \
+        user_info.get('first_name', '') or user_info.get('name', '')
+    bot_user.last_name = user_info.get('last_name', '')
+    bot_user.timezone = user_info.get('timezone', None)
+    bot_user.locale = user_info.get('locale', '')
 
     bot_user.requests_count += 1
     bot_user.save()
@@ -64,7 +64,7 @@ def save_bot_user(source, chat_user_id, user_info={}):
 
 def save_bot_message(source, message):
     bot_message, created = MessageStats.objects.get_or_create(
-        phrase=translit(message.lower().strip()),
+        phrase=message.lower().strip(),
         source=source,
     )
     bot_message.requests_count += 1
