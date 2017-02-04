@@ -1,6 +1,7 @@
 import requests
 
 from django.conf import settings
+from django.utils import timezone
 
 from .models import SOURCE_FACEBOOK, SOURCE_TELEGRAM
 from .models import BotUser, BotUserRequestStats, MessageStats
@@ -49,3 +50,12 @@ def save_bot_user(source, chat_user_id, user_info={}):
 
     bot_user.requests_count += 1
     bot_user.save()
+
+    # Save user daily stats
+    today = timezone.now().date()
+    bot_user_request, created = BotUserRequestStats.objects.get_or_create(
+        bot_user=bot_user,
+        day=today,
+    )
+    bot_user_request.requests_count += 1
+    bot_user_request.save()
