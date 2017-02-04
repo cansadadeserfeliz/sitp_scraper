@@ -163,7 +163,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING'),
             'handlers': ['sentry', 'console'],
             'propagate': False,
         },
