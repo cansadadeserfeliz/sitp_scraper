@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.gis.db import models as geo_models
 
 
 class BusStation(models.Model):
@@ -19,6 +20,7 @@ class BusStation(models.Model):
         ),
         default=LOCATION_PENDING,
     )
+    location = geo_models.PointField(null=True)
     longitude = models.FloatField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     source = models.CharField(max_length=30, default='', blank=True)
