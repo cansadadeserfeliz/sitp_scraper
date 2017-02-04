@@ -12,6 +12,7 @@ requests==2.11.1
 Scrapy==1.1.2
 scrapy-djangoitem==1.1.1
 telepot==10.4
+transliterate==1.9
 Unipath==1.1
 whitenoise==3.2.3
 

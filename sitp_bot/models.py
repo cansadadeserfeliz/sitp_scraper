@@ -19,6 +19,13 @@ class BotUser(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return '{} {} {}'.format(
+            self.chat_user_id,
+            self.first_name,
+            self.last_name,
+        ).strip()
+
     class Meta:
         verbose_name = 'Bot User'
         verbose_name_plural = 'Bot Users'

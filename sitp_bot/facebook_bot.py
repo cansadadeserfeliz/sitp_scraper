@@ -3,7 +3,7 @@ import logging
 from django.conf import settings
 
 from .models import SOURCE_FACEBOOK
-from .utils import save_bot_user
+from .utils import save_bot_user, save_bot_message
 
 logger = logging.getLogger('facebook.bot')
 
@@ -55,6 +55,7 @@ def received_message(event):
     save_bot_user(SOURCE_FACEBOOK, sender_id)
 
     if message_text:
+        save_bot_message(SOURCE_FACEBOOK, message_text)
         # If we receive a text message, check to see if it matches a keyword
         # and send back the example. Otherwise, just echo the text we received
         if message_text == 'generic':

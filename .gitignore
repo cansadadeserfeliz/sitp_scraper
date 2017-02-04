@@ -1,4 +1,5 @@
 .pyc
+.sql
 
 .idea/
 __pycache__/
