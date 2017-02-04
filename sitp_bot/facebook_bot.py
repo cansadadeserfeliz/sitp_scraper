@@ -46,15 +46,14 @@ def send_generic_message(
 def received_message(event):
     sender_id = event['sender']['id']
     recipient_id = event['recipient']['id']
-    time_of_message = event['timestamp']
     message = event['message']
 
     # Indicates the message sent from the page itself
     is_echo = message.get('is_echo', False)
     if is_echo:
-        return 
+        return
 
-    message_id = message['mid']
+    # Text of message
     message_text = message.get('text')
 
     message_attachments = message.get('attachments')
