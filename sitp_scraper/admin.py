@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.gis import admin as gis_admin
 from django.utils.html import mark_safe
 
 from .models import BusStation, RouteStations, Route
@@ -9,12 +10,12 @@ class RouteStationsInline(admin.TabularInline):
 
 
 @admin.register(BusStation)
-class BusStationAdmin(admin.ModelAdmin):
+class BusStationAdmin(gis_admin.OSMGeoAdmin):
     search_fields = ('code', 'name', 'address')
     list_display = (
         'name', 'code',
         'address', 'sublocality',
-        'longitude', 'latitude', 'location_status',
+        'location', 'location_status',
         'created_at', 'updated_at',
         'source', 'sitp_url',
     )
@@ -36,31 +37,23 @@ class BusStationAdmin(admin.ModelAdmin):
             'fields': ('address', 'sublocality'),
         }),
         ('Map', {
-            'description': '<div id="map"></div>',
-            'fields': ('longitude', 'latitude', 'location_status'),
+            'fields': ('location', 'location_status',),
         }),
         ('SITP', {
             'fields': (('related_stations',), ('link',)),
         }),
     )
 
+    openlayers_url = '//openlayers.org/api/2.13.1/OpenLayers.js'
+    default_lon = -8248449
+    default_lat = 520158
+    default_zoom = 11
+
     def sitp_url(self, obj):
         if obj.link:
             return mark_safe('<a href="%s" target="_blank">SITP</a>' % obj.link)
         return ''
 
-    class Media:
-        css = {
-            "all": (
-                "https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css",
-                "css/admin_map.css",
-            )
-        }
-        js = (
-            "https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js",
-            "https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js",
-            "js/admin_map.js",
-        )
 
 @admin.register(RouteStations)
 class RouteStationsAdmin(admin.ModelAdmin):

@@ -7,7 +7,7 @@ from .models import Route, BusStation, RouteStations
 def get_routes(request):
     features = []
     for bus_station in BusStation.objects.prefetch_related('route_stations').all():
-        if bus_station.longitude and bus_station.latitude:
+        if bus_station.location:
             routes = set(bus_station.route_stations.values_list(
                 'route__code', flat=True,
             ))
@@ -25,7 +25,7 @@ def get_routes(request):
                 },
                 "geometry": {
                 "type": "Point",
-                "coordinates": [bus_station.longitude, bus_station.latitude]
+                "coordinates": [bus_station.location.x, bus_station.location.y]
                 }
             })
     return JsonResponse({
@@ -38,7 +38,7 @@ def get_route(request, pk):
     features = []
     route = Route.objects.get(id=pk)
     for bs in route.route_stations.all():
-        if bs.bus_station.longitude and bs.bus_station.latitude:
+        if bs.bus_station.location:
             features.append({
                 "type": "Feature",
                 "properties": {
@@ -50,14 +50,13 @@ def get_route(request, pk):
                 "geometry": {
                     "type": "Point",
                     "coordinates": [
-                        bs.bus_station.longitude,
-                        bs.bus_station.latitude,
+                        bs.bus_station.location.x,
+                        bs.bus_station.location.y,
                     ]
                 }
             })
     bs_list = list(route.route_stations.filter(
-        bus_station__longitude__isnull=False,
-        bus_station__latitude__isnull=False,
+        bus_station__location__isnull=False,
     ))
     for bs1, bs2 in zip(bs_list[:-1], bs_list[1:]):
         features.append({
@@ -65,8 +64,8 @@ def get_route(request, pk):
             'geometry': {
                 'type': 'LineString',
                 'coordinates': [
-                    [bs1.bus_station.longitude, bs1.bus_station.latitude],
-                    [bs2.bus_station.longitude, bs2.bus_station.latitude]
+                    [bs1.bus_station.location.x, bs1.bus_station.location.y],
+                    [bs2.bus_station.location.x, bs2.bus_station.location.y]
                 ]
             },
             'properties': {
