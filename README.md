@@ -10,7 +10,7 @@
     $ psql <db name>
     > CREATE EXTENSION postgis;
 
-    $ touch sitp_scraper/local_settings.py
+    $ cp sitp_scraper/local_settings.example.py sitp_scraper/local_settings.py
 
     $ mkvirtualenv sitp_scraper
     $ pip install -r requirements.txt
