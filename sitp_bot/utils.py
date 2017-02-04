@@ -1,4 +1,5 @@
 import requests
+from transliterate import translit
 
 from django.conf import settings
 from django.utils import timezone
@@ -59,3 +60,12 @@ def save_bot_user(source, chat_user_id, user_info={}):
     )
     bot_user_request.requests_count += 1
     bot_user_request.save()
+
+
+def save_bot_message(source, message):
+    bot_message, created = MessageStats.objects.get_or_create(
+        phrase=translit(message.lower().strip()),
+        source=source,
+    )
+    bot_message.requests_count += 1
+    bot_message.save()
