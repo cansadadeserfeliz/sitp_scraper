@@ -22,8 +22,7 @@ def get_facebook_user_info(user_id):
     try:
         response = requests.get(
             'https://graph.facebook.com/v2.6/{user_id}'
-            '?fields=first_name,last_name,profile_pic,locale,timezone,gender'
-            '&access_token={access_token}'.format(
+            '?access_token={access_token}'.format(
                 user_id=user_id,
                 access_token=settings.FACEBOOK_PAGE_ACCESS_TOKEN,
             )
@@ -41,7 +40,9 @@ def save_bot_user(source, chat_user_id, user_info={}):
     )
     if source == SOURCE_FACEBOOK:
         user_info = get_facebook_user_info(chat_user_id)
-        bot_user.first_name = user_info.get('first_name', '')
+        # It can be Facebook user or Facebook page
+        bot_user.first_name = \
+            user_info.get('first_name', '') or user_info.get('name', '')
         bot_user.last_name = user_info.get('last_name', '')
         bot_user.timezone = user_info.get('timezone', None)
         bot_user.locale = user_info.get('locale', '')
