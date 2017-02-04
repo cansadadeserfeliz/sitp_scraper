@@ -20,6 +20,8 @@ class BotUser(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = 'Bot User'
+        verbose_name_plural = 'Bot Users'
         unique_together = ('source', 'chat_user_id')
 
 
@@ -29,6 +31,8 @@ class BotUserRequestStats(models.Model):
     day = models.DateField()
 
     class Meta:
+        verbose_name = 'Bot User stats'
+        verbose_name_plural = 'Bot User stats'
         unique_together = ('bot_user', 'day')
 
 
@@ -44,4 +48,6 @@ class MessageStats(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = 'Bot Messages Stats'
+        verbose_name_plural = 'Bot Messages Stats'
         unique_together = ('source', 'phrase')
