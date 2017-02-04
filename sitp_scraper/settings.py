@@ -172,6 +172,11 @@ LOGGING = {
             'handlers': ['sentry', 'console'],
             'propagate': False,
         },
+        'facebook.bot': {
+            'level': 'DEBUG',
+            'handlers': ['sentry', 'console'],
+            'propagate': False,
+        },
     },
 }
 

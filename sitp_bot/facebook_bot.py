@@ -2,7 +2,10 @@ import requests
 import logging
 from django.conf import settings
 
-logger = logging.getLogger('bots')
+from .models import SOURCE_FACEBOOK
+from .utils import save_bot_user
+
+logger = logging.getLogger('facebook.bot')
 
 
 def call_send_api(message_data):
@@ -48,6 +51,8 @@ def received_message(event):
     message_id = message['mid']
     message_text = message.get('text')
     message_attachments = message.get('attachments')
+
+    save_bot_user(SOURCE_FACEBOOK, sender_id)
 
     if message_text:
         # If we receive a text message, check to see if it matches a keyword
