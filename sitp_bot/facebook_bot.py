@@ -48,8 +48,15 @@ def received_message(event):
     recipient_id = event['recipient']['id']
     time_of_message = event['timestamp']
     message = event['message']
+
+    # Indicates the message sent from the page itself
+    is_echo = message.get('is_echo', False)
+    if is_echo:
+        return 
+
     message_id = message['mid']
     message_text = message.get('text')
+
     message_attachments = message.get('attachments')
 
     save_bot_user(SOURCE_FACEBOOK, sender_id)
