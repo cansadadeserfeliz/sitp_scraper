@@ -21,9 +21,22 @@ class BotUserAdmin(admin.ModelAdmin):
 
 @admin.register(BotUserRequestStats)
 class BotUserRequestStatsAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        'bot_user',
+        'requests_count',
+        'day',
+    )
+    search_fields = ('bot_user',)
 
 
 @admin.register(MessageStats)
 class MessageStatsAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        'phrase',
+        'source',
+        'requests_count',
+        'created_at',
+        'updated_at',
+    )
+    search_fields = ('bot_user',)
+    list_filter = ('source', )
