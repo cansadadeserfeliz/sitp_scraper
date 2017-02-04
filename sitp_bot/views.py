@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.template.loader import render_to_string
 
+from sitp_bot.facebook_bot import received_message as facebook_received_message
 from sitp_scraper.models import Route, RouteStations, BusStation
 from sitp_bot.utils import EMOJI_CODES
 
@@ -176,3 +177,41 @@ class FacebookCommandReceiveView(View):
             return HttpResponse(request.GET.get('hub.challenge'))
         else:
             return HttpResponseForbidden()
+
+    def post(self, request, bot_keyword):
+        if bot_keyword != settings.FACEBOOK_VERIFY_TOKEN:
+            return HttpResponseForbidden('Invalid token')
+
+        data = json.loads(request.body.decode('utf-8'))
+        logger.info('FB bot', extra={'data': data})
+
+        # Make sure this is a page subscription
+        if data['object'] == 'page':
+            # Iterate over each entry - there may be multiple if batched
+            for entry in data['entry']:
+                # Iterate over each messaging event
+                for event in entry['messaging']:
+                    if event.get('message'):
+                        facebook_received_message(event)
+                    elif event.get('delivery'):
+                        pass
+                        #logger.info('FB. Message delivered: {}'.format(event))
+                    elif event.get('read'):
+                        pass
+                        #logger.info('FB. Message read: {}'.format(event))
+                    elif event.get('postback'):
+                        logger.info('FB. Message is postback: {}'.format(event))
+                    elif event.get('optin'):
+                        logger.info('FB. Message is optin: {}'.format(event))
+                    elif event.get('referral'):
+                        logger.info('FB. Message is referral: {}'.format(event))
+                    elif event.get('account_linking'):
+                        logger.info('FB. Message is account linking: {}'.format(event))
+                    else:
+                        logger.info('Webhook received unknown event: {}'.format(event))
+
+        # Assume all went well.
+        # You must send back a 200, within 20 seconds, to let us know
+        # you've successfully received the callback. Otherwise, the request
+        # will time out and we will keep trying to resend.
+        return HttpResponse()
