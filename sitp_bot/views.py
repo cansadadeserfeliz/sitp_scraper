@@ -165,3 +165,14 @@ class CommandReceiveView(View):
         return response
 
 
+class FacebookCommandReceiveView(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(FacebookCommandReceiveView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, bot_keyword):
+        if request.GET.get('hub.mode') == 'subscribe' and request.GET.get('hub.verify_token') == settings.FACEBOOK_VERIFY_TOKEN:
+            return request.GET.get('hub.challenge')
+        else:
+            return HttpResponseForbidden()
