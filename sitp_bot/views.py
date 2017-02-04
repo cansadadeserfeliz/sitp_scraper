@@ -4,7 +4,7 @@ import telepot
 from geopy.distance import great_circle
 
 from django.views.generic import View
-from django.http import JsonResponse, HttpResponseForbidden, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
@@ -173,6 +173,6 @@ class FacebookCommandReceiveView(View):
 
     def get(self, request, bot_keyword):
         if request.GET.get('hub.mode') == 'subscribe' and request.GET.get('hub.verify_token') == settings.FACEBOOK_VERIFY_TOKEN:
-            return request.GET.get('hub.challenge')
+            return HttpResponse(request.GET.get('hub.challenge'))
         else:
             return HttpResponseForbidden()
