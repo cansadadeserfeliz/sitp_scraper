@@ -1,3 +1,11 @@
+import requests
+
+from django.conf import settings
+
+from .models import SOURCE_FACEBOOK, SOURCE_TELEGRAM
+from .models import BotUser, BotUserRequestStats, MessageStats
+
+
 EMOJI_CODES = {
     'alarm_clock': '\u23f0',
     'clock_face_ten_o_clock': '\U0001F559',
@@ -8,3 +16,35 @@ EMOJI_CODES = {
     'smiling_face_with_smiling_eyes': '\U0001F60A',
     'rain': '\U00002614',
 }
+
+
+def get_facebook_user_info(user_id):
+    try:
+        response = requests.get(
+            'https://graph.facebook.com/v2.6/{user_id}'
+            '?fields=first_name,last_name,profile_pic,locale,timezone,gender'
+            '&access_token={access_token}'.format(
+                user_id=user_id,
+                access_token=settings.FACEBOOK_PAGE_ACCESS_TOKEN,
+            )
+        )
+        user_info = response.json()
+    except:
+        return {}
+    return user_info
+
+
+def save_bot_user(source, chat_user_id, user_info={}):
+    bot_user, created = BotUser.objects.get_or_create(
+        source=source,
+        chat_user_id=chat_user_id,
+    )
+    if source == SOURCE_FACEBOOK:
+        user_info = get_facebook_user_info(chat_user_id)
+        bot_user.first_name = user_info.get('first_name', '')
+        bot_user.last_name = user_info.get('last_name', '')
+        bot_user.timezone = user_info.get('timezone', None)
+        bot_user.locale = user_info.get('locale', '')
+
+    bot_user.requests_count += 1
+    bot_user.save()
