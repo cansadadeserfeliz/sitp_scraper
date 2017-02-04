@@ -22,6 +22,7 @@ from .views import get_routes, get_route, RouteListView, RouteDetailView
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='index.html'), name='index'),
+    url(r'^terms/$', TemplateView.as_view(template_name='terms.html'), name='terms'),
     url(r'^routes/$', RouteListView.as_view(), name='route_list'),
     url(r'^route/(?P<pk>\d+)/$', RouteDetailView.as_view(), name='route_detail'),
     url(r'^get_routes/$', get_routes, name='get_routes'),
