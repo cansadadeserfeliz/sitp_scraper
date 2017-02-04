@@ -4,6 +4,7 @@ from django.conf import settings
 
 from .models import SOURCE_FACEBOOK
 from .utils import save_bot_user, save_bot_message
+from sitp_scraper import utils as sitp_utils
 
 logger = logging.getLogger('facebook.bot')
 
@@ -67,6 +68,13 @@ def received_message(event):
         if message_text == 'generic':
             send_generic_message(sender_id)
             return
+        if 'estación' in message_text.lower() or 'estacion' in message_text.lower():
+            send_generic_message(
+                sender_id,
+                'Por favor, envíame tu ubicación para poder la estación más cercana',
+                quick_replies=[{'content_type': 'location'},
+            ])
+            return
         else:
             send_generic_message(sender_id, 'Hola, soy SITP Bot y estoy aprendiendo cosas :)')
     elif message_attachments:
@@ -82,3 +90,9 @@ def received_message(event):
             elif attachment['type'] == 'location':
                 latitude = attachment['payload']['coordinates']['lat']
                 longitude = attachment['payload']['coordinates']['long']
+                bus_station = sitp_utils.get_closest_station(latitude, longitude)
+                if bus_station:
+                    send_generic_message(sender_id, 'Tu estación es más cercana es {}'.format(bus_station.name))
+                else:
+                    send_generic_message(sender_id, 'Estás muy lejos :(')
+
