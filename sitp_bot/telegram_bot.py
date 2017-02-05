@@ -14,8 +14,11 @@ def display_help(bot, first_name):
     ))
 
 
-def send_bus_info(bot, chat_id, route_code):
-    route = Route.objects.filter(code__iexact=route_code).first()
+def send_bus_info(bot, chat_id, route_code='', bus_id=None):
+    if bus_id:
+        route = Route.objects.filter(id=bus_id).first()
+    else:
+        route = Route.objects.filter(code__iexact=route_code).first()
     if not route:
         message = \
             'No conozco esa ruta {}'.format(EMOJI_CODES['disappointed'])
