@@ -71,7 +71,15 @@ def received_message(event):
         route = sitp_utils.get_route(message_text)
 
         if route:
-            send_generic_message(sender_id, 'Ruta {}'.format(route.name))
+            send_generic_message(sender_id, '''
+            {code} {name} es una ruta {route_type}.
+            Aquí {map_link} puedes encontrar el mapa de la ruta.
+            '''.format(
+                code=route.code,
+                name=route.name,
+                route_type=route.get_route_type_display(),
+                map_link=route.map_link,
+            ))
             return
 
         if any(t in message_text.lower() for t in [
