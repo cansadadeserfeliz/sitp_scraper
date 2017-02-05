@@ -1,3 +1,5 @@
+import re
+
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
@@ -18,6 +20,6 @@ def get_closest_station(latitude, longitude):
 
 def get_route(text):
     text = text.lower().strip()
-    text = ''.join(filter(str.isalpha, text))
+    text = re.sub(r'\W+', '', text)
     text = text.replace('bus', '').replace(' ', '')
     return Route.objects.filter(code__iexact=text).first()
