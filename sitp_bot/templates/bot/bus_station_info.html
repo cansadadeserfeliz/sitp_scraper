@@ -1,4 +1,4 @@
 {{ EMOJI_CODES.bus }} Parada *{{ bus_station.code }}* {{ bus_station.name }} / {{ bus_station.address }}
 
 Rutas: {% for route in routes %}
-*{{ route.code }}* - {{ route.name }}{% endfor %}
+*{{ route.code }}* - {{ route.name }} /bus{{ route.id }}{% endfor %}

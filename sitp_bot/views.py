@@ -1,6 +1,7 @@
 import json
 import logging
 import telepot
+import re
 
 from django.views.generic import View
 from django.http import (
@@ -58,6 +59,11 @@ class CommandReceiveView(View):
             return response
 
         text = payload['message'].get('text')
+
+        bus_match = re.fullmatch(r'/bus(\d+)', '/bus9')
+        if bus_match:
+            send_bus_info(TelegramBot, chat_id, bus_id=bus_match.group(1)),
+
         cmd = ''
         if text:
             save_bot_message(SOURCE_TELEGRAM, text)
