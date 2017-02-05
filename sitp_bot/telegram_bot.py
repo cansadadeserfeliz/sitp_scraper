@@ -5,6 +5,7 @@ from django.template.loader import render_to_string
 from sitp_scraper.models import Route, RouteStations, BusStation
 
 from sitp_bot.utils import EMOJI_CODES
+from sitp_scraper import utils as sitp_utils
 
 
 def display_help(bot, first_name):
@@ -36,10 +37,11 @@ def send_bus_info(bot, chat_id, route_code='', bus_id=None):
     bot.sendMessage(chat_id, message, parse_mode='Markdown')
 
 
-def send_bus_station_info(bot, chat_id, bus_station_code):
-    bus_station = BusStation.objects.filter(
-        code__iexact=bus_station_code,
-    ).first()
+def send_bus_station_info(bot, chat_id, bus_station_code='', bus_station=None):
+    if not bus_station:
+        bus_station = BusStation.objects.filter(
+            code__iexact=bus_station_code,
+        ).first()
     if not bus_station:
         message = 'No conozco esa parada {}'.format(EMOJI_CODES['disappointed'])
         bot.sendMessage(chat_id, message, parse_mode='Markdown')
@@ -59,29 +61,7 @@ def send_bus_station_info(bot, chat_id, bus_station_code):
 
 
 def send_nearest_bus_station(bot, chat_id, location):
-    min_latitude = 0.01
-    min_longitude = 0.01
-    bus_stations = {
-        bs.code: (bs.latitude, bs.longitude)
-        for bs in BusStation.objects.filter(
-            latitude__gte=location['latitude'] - min_latitude,
-            latitude__lte=location['latitude'] + min_latitude,
-            longitude__gte=location['longitude'] - min_longitude,
-            longitude__lte=location['longitude'] + min_longitude,
-        )
-    }
-
-    def distance(x, y):
-        return great_circle(x, y).miles
-
-    nearest = min(
-        bus_stations.values(),
-        key=lambda x: distance(
-            x,
-            (location['latitude'], location['longitude'])
-        )
+    bus_station = sitp_utils.get_closest_station(
+        location['latitude'], location['longitude']
     )
-    send_bus_station_info(bot, chat_id, BusStation.objects.filter(
-        latitude=nearest[0],
-        longitude=nearest[1],
-    ).first().code)
+    send_bus_station_info(bot, chat_id, bus_station=bus_station)
