@@ -24,7 +24,9 @@ def call_send_api(message_data):
 
 def send_generic_message(
         recipient_id,
-        message_text='Hola, soy SITP bot',
+        message_text=
+        'Hola, soy SITP bot. Envíame el código de bus que estás buscando o '
+        'tu ubicación para encontrar el paradero más cercano.',
         command=None,
         quick_replies=[],
         attachment={},
@@ -65,10 +67,21 @@ def received_message(event):
         save_bot_message(SOURCE_FACEBOOK, message_text)
         # If we receive a text message, check to see if it matches a keyword
         # and send back the example. Otherwise, just echo the text we received
-        if message_text == 'generic':
+
+        route = sitp_utils.get_route(message_text)
+
+        if route:
+            send_generic_message(sender_id, 'Ruta {}'.format(route.name))
+            return
+
+        if any(t in message_text.lower() for t in [
+            'hola', 'saludos', 'hello', 'hi',
+        ]):
             send_generic_message(sender_id)
             return
-        if 'estación' in message_text.lower() or 'estacion' in message_text.lower():
+        if any(t in message_text.lower() for t in [
+            'estación', 'estacion', 'parada', 'station', 'paradero',
+        ]):
             send_generic_message(
                 sender_id,
                 'Por favor, envíame tu ubicación para poder la estación más cercana',
@@ -76,7 +89,8 @@ def received_message(event):
             ])
             return
         else:
-            send_generic_message(sender_id, 'Hola, soy SITP Bot y estoy aprendiendo cosas :)')
+            send_generic_message(
+                sender_id, 'Hola, soy SITP Bot y estoy aprendiendo cosas :)')
     elif message_attachments:
         for attachment in message_attachments:
             if attachment['type'] == 'image':
