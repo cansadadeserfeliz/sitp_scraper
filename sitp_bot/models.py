@@ -12,6 +12,7 @@ class BotUser(models.Model):
     chat_user_id = models.CharField(max_length=50)
     first_name = models.CharField(max_length=150, default='')
     last_name = models.CharField(max_length=150, default='')
+    username = models.CharField(max_length=50, default='')
     timezone = models.SmallIntegerField(null=True)
     locale = models.CharField(max_length=10, default='')
     requests_count = models.BigIntegerField(default=0)
