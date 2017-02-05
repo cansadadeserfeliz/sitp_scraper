@@ -60,9 +60,10 @@ class CommandReceiveView(View):
 
         text = payload['message'].get('text')
 
-        bus_match = re.fullmatch(r'/bus(\d+)', '/bus9')
+        bus_match = re.fullmatch(r'/bus(\d+)', text)
         if bus_match:
-            send_bus_info(TelegramBot, chat_id, bus_id=bus_match.group(1)),
+            send_bus_info(TelegramBot, chat_id, bus_id=bus_match.group(1))
+            return response
 
         cmd = ''
         if text:
