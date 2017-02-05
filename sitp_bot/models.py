@@ -30,6 +30,7 @@ class BotUser(models.Model):
         verbose_name = 'Bot User'
         verbose_name_plural = 'Bot Users'
         unique_together = ('source', 'chat_user_id')
+        ordering = ['-updated_at']
 
 
 class BotUserRequestStats(models.Model):
@@ -41,6 +42,7 @@ class BotUserRequestStats(models.Model):
         verbose_name = 'Bot User stats'
         verbose_name_plural = 'Bot User stats'
         unique_together = ('bot_user', 'day')
+        ordering = ['-day', 'requests_count']
 
 
 class MessageStats(models.Model):
@@ -58,3 +60,4 @@ class MessageStats(models.Model):
         verbose_name = 'Bot Messages Stats'
         verbose_name_plural = 'Bot Messages Stats'
         unique_together = ('source', 'phrase')
+        ordering = ['-requests_count']
