@@ -42,7 +42,7 @@ class BotUserRequestStats(models.Model):
         verbose_name = 'Bot User stats'
         verbose_name_plural = 'Bot User stats'
         unique_together = ('bot_user', 'day')
-        ordering = ['-day', 'requests_count']
+        ordering = ['-day', '-requests_count']
 
 
 class MessageStats(models.Model):
