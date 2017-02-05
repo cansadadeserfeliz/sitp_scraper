@@ -10,6 +10,7 @@ class BotUserAdmin(admin.ModelAdmin):
         'source',
         'first_name',
         'last_name',
+        'username',
         'timezone',
         'locale',
         'requests_count',

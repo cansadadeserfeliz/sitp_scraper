@@ -46,6 +46,7 @@ def save_bot_user(source, chat_user_id, user_info={}):
     bot_user.first_name = \
         user_info.get('first_name', '') or user_info.get('name', '')
     bot_user.last_name = user_info.get('last_name', '')
+    bot_user.username = user_info.get('username', '')
     bot_user.timezone = user_info.get('timezone', None)
     bot_user.locale = user_info.get('locale', '')
 
