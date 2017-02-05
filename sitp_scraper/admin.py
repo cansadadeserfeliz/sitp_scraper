@@ -44,6 +44,8 @@ class BusStationAdmin(gis_admin.OSMGeoAdmin):
         }),
     )
 
+    list_filter = ('location_status', )
+
     openlayers_url = '//openlayers.org/api/2.13.1/OpenLayers.js'
     default_lon = -8248449
     default_lat = 520158

@@ -5,6 +5,7 @@
 __pycache__/
 static/
 staticfiles/
+data/
 
 /sitp_scraper/local_settings.py
 stip-urbano.json
