@@ -94,8 +94,11 @@ class CommandReceiveView(View):
             if len(words) != 2:
                 TelegramBot.sendMessage(
                     chat_id,
-                    'Tienes que escribir el número de la parada. '
-                    'Por ejemplo, /parada 216B00')
+                    'Tienes que escribir el número de la parada. \n'
+                    'Por ejemplo, /parada 216B00 \n'
+                    '[Foto](http://www.sitp.gov.co/modulos/Rutas/img/ParaderosPuntoParada.png)',
+                    parse_mode='Markdown',
+                )
             else:
                 send_bus_station_info(TelegramBot, chat_id, words[1])
                 return response
