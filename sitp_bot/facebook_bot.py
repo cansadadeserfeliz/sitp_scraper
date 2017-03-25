@@ -1,52 +1,17 @@
-import requests
 import logging
 from django.conf import settings
 
 from .models import SOURCE_FACEBOOK
-from .utils import save_bot_user, save_bot_message
+from .utils import save_bot_user, save_bot_message, send_bus_or_station_info
 from sitp_scraper import utils as sitp_utils
+from python_bot_utils.facebook import MessengerBot, QuickReply
 
 logger = logging.getLogger('facebook.bot')
 
 
-def call_send_api(message_data):
-    response = requests.post(
-        'https://graph.facebook.com/v2.6/me/messages?access_token={}'.format(settings.FACEBOOK_PAGE_ACCESS_TOKEN),
-        json=message_data,
-    )
-    if response.status_code == 200:
-        response_body = response.json()
-        recipient_id = response_body['recipient_id']
-        message_id = response_body['message_id']
-    else:
-        logger.error('Unable to send message. Status code: {}'.format(response.status_code))
-
-
-def send_generic_message(
-        recipient_id,
-        message_text=
-        'Hola, soy SITP bot. Envíame el código de bus que estás buscando o '
-        'tu ubicación para encontrar el paradero más cercano.',
-        command=None,
-        quick_replies=[],
-        attachment={},
-):
-    message_data = {
-        'recipient': {
-            'id': recipient_id,
-        },
-        'message': {
-            'text': message_text,
-        },
-    }
-    if quick_replies:
-        message_data['message']['quick_replies'] = quick_replies
-    if attachment:
-        message_data['message']['attachment'] = attachment
-    call_send_api(message_data)
-
-
 def received_message(event):
+    bot = MessengerBot(settings.FACEBOOK_PAGE_ACCESS_TOKEN)
+
     sender_id = event['sender']['id']
     recipient_id = event['recipient']['id']
     message = event['message']
@@ -56,65 +21,62 @@ def received_message(event):
     if is_echo:
         return
 
+    save_bot_user(SOURCE_FACEBOOK, sender_id)
+
     # Text of message
     message_text = message.get('text')
 
-    message_attachments = message.get('attachments')
-
-    save_bot_user(SOURCE_FACEBOOK, sender_id)
-
     if message_text:
         save_bot_message(SOURCE_FACEBOOK, message_text)
+        message_text = message_text.lower().strip()
+
+    message_attachments = message.get('attachments')
+
+    if message_text:
         # If we receive a text message, check to see if it matches a keyword
         # and send back the example. Otherwise, just echo the text we received
 
-        route = sitp_utils.get_route(message_text)
-
-        if route:
-            send_generic_message(sender_id, '''
-            {code} {name} es una ruta {route_type}.
-            Aquí {map_link} puedes encontrar el mapa de la ruta.
-            '''.format(
-                code=route.code,
-                name=route.name,
-                route_type=route.get_route_type_display(),
-                map_link=route.map_link,
-            ))
-            return
-
-        if any(t in message_text.lower() for t in [
+        if any(t in message_text for t in [
             'hola', 'saludos', 'hello', 'hi',
         ]):
-            send_generic_message(sender_id)
+            bot.sendMessage(sender_id, 'Hola :smile: Soy SITP Bot')
             return
-        if any(t in message_text.lower() for t in [
+        if any(t in message_text for t in [
             'estación', 'estacion', 'parada', 'station', 'paradero',
         ]):
-            send_generic_message(
+            bot.sendQuickReply(
                 sender_id,
-                'Por favor, envíame tu ubicación para poder la estación más cercana',
-                quick_replies=[{'content_type': 'location'},
-            ])
+                'Por favor, envíame tu ubicación para poder '
+                'la estación más cercana',
+                [QuickReply('location')]
+            )
             return
-        else:
-            send_generic_message(
-                sender_id, 'Hola, soy SITP Bot y estoy aprendiendo cosas :)')
+
+        # Try to get bus station or route
+        if not send_bus_or_station_info(SOURCE_FACEBOOK, bot, sender_id, message_text):
+            bot.sendMessage(
+                sender_id,
+                'Tienes que escribir el número de bus o de la parada. \n'
+                'Por ejemplo, *18-2* o *033A06*'
+            )
+            bot.sendImage(sender_id, 'http://www.sitp.gov.co/modulos/Rutas/img/ParaderosPuntoParada.png')
+            return
     elif message_attachments:
         for attachment in message_attachments:
             if attachment['type'] == 'image':
-                send_generic_message(sender_id, 'Gracias por la foto ;) {}'.format(attachment['payload']['url']))
+                bot.sendMessage(sender_id, 'Gracias por la foto ;) {}'.format(attachment['payload']['url']))
             elif attachment['type'] == 'audio':
-                send_generic_message(sender_id, 'Gracias por el audio ;) {}'.format(attachment['payload']['url']))
+                bot.sendMessage(sender_id, 'Gracias por el audio ;) {}'.format(attachment['payload']['url']))
             elif attachment['type'] == 'video':
-                send_generic_message(sender_id, 'Gracias por el video ;) {}'.format(attachment['payload']['url']))
+                bot.sendMessage(sender_id, 'Gracias por el video ;) {}'.format(attachment['payload']['url']))
             elif attachment['type'] == 'file':
-                send_generic_message(sender_id, 'Gracias por el archivo ;) {}'.format(attachment['payload']['url']))
+                bot.sendMessage(sender_id, 'Gracias por el archivo ;) {}'.format(attachment['payload']['url']))
             elif attachment['type'] == 'location':
                 latitude = attachment['payload']['coordinates']['lat']
                 longitude = attachment['payload']['coordinates']['long']
                 bus_station = sitp_utils.get_closest_station(latitude, longitude)
                 if bus_station:
-                    send_generic_message(sender_id, 'Tu estación es más cercana es {}'.format(bus_station.name))
+                    bot.sendMessage(sender_id, 'Tu estación es más cercana es {}'.format(bus_station.name))
                 else:
-                    send_generic_message(sender_id, 'Estás muy lejos :(')
+                    bot.sendMessage(sender_id, 'Estás muy lejos :(')
 
