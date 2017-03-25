@@ -2,9 +2,9 @@ import logging
 from django.conf import settings
 
 from .models import SOURCE_FACEBOOK
-from .utils import save_bot_user, save_bot_message
+from .utils import save_bot_user, save_bot_message, send_bus_or_station_info
 from sitp_scraper import utils as sitp_utils
-from python_bot_utils.facebook import MessengerBot
+from python_bot_utils.facebook import MessengerBot, QuickReply
 
 logger = logging.getLogger('facebook.bot')
 
@@ -36,35 +36,31 @@ def received_message(event):
         # If we receive a text message, check to see if it matches a keyword
         # and send back the example. Otherwise, just echo the text we received
 
-        route = sitp_utils.get_route(message_text)
-
-        if route:
-            bot.sendMessage(sender_id, '''
-            {code} {name} es una ruta {route_type}.
-            '''.format(
-                code=route.code,
-                name=route.name,
-                route_type=route.get_route_type_display(),
-            ))
-            bot.sendImage(sender_id, route.map_link)
-            return
-
-        if any(t in message_text.lower() for t in [
+        if any(t in message_text for t in [
             'hola', 'saludos', 'hello', 'hi',
         ]):
-            bot.sendMessage(sender_id)
+            bot.sendMessage(sender_id, 'Hola :smile: Soy SITP Bot')
             return
-        if any(t in message_text.lower() for t in [
+        if any(t in message_text for t in [
             'estación', 'estacion', 'parada', 'station', 'paradero',
         ]):
+            bot.sendQuickReply(
+                sender_id,
+                'Por favor, envíame tu ubicación para poder '
+                'la estación más cercana',
+                [QuickReply('location')]
+            )
+            return
+
+        # Try to get bus station or route
+        if not send_bus_or_station_info(SOURCE_FACEBOOK, bot, sender_id, message_text):
             bot.sendMessage(
                 sender_id,
-                'Por favor, envíame tu ubicación para poder la estación más cercana',
-                quick_replies=[{'content_type': 'location'},
-            ])
+                'Tienes que escribir el número de bus o de la parada. \n'
+                'Por ejemplo, *18-2* o *033A06*'
+            )
+            bot.sendImage(sender_id, 'http://www.sitp.gov.co/modulos/Rutas/img/ParaderosPuntoParada.png')
             return
-        else:
-            bot.sendMessage(sender_id, 'Hola, soy SITP Bot y estoy aprendiendo cosas :)')
     elif message_attachments:
         for attachment in message_attachments:
             if attachment['type'] == 'image':

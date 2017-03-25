@@ -2,9 +2,14 @@ import requests
 
 from django.conf import settings
 from django.utils import timezone
+from django.template.loader import render_to_string
 
-from .models import SOURCE_FACEBOOK
+from .models import SOURCE_FACEBOOK, SOURCE_TELEGRAM
 from .models import BotUser, BotUserRequestStats, MessageStats
+from sitp_scraper.models import Route, BusStation
+from sitp_scraper import utils as sitp_utils
+
+from python_bot_utils.telegram import send_markdown_message
 
 
 def get_facebook_user_info(user_id):
@@ -58,3 +63,85 @@ def save_bot_message(source, message):
     )
     bot_message.requests_count += 1
     bot_message.save()
+
+
+def send_bus_info(bot_type, bot, chat_id, route=None):
+    if route:
+        if bot_type == SOURCE_TELEGRAM:
+            message = render_to_string('bot/route_info.html', dict(route=route))
+            send_markdown_message(bot, chat_id, message)
+        elif bot_type == SOURCE_FACEBOOK:
+            bot.sendMessage(chat_id, '''
+            {code} {name} es una ruta {route_type}.
+            '''.format(
+                code=route.code,
+                name=route.name,
+                route_type=route.get_route_type_display(),
+            ))
+            bot.sendImage(chat_id, route.map_link)
+    else:
+        message = 'No conozco esa ruta :disappointed:'
+        if bot_type == SOURCE_TELEGRAM:
+            send_markdown_message(bot, chat_id, message)
+        elif bot_type == SOURCE_FACEBOOK:
+            bot.sendMessage(chat_id, message)
+
+
+def send_bus_station_info(bot_type, bot, chat_id, bus_station=None):
+    if not bus_station:
+        message = 'No conozco esa parada :disappointed:'
+        if bot_type == SOURCE_TELEGRAM:
+            send_markdown_message(bot, chat_id, message)
+        elif bot_type == SOURCE_FACEBOOK:
+            bot.sendMessage(chat_id, message)
+        return
+
+    route_codes = [int(i) for i in set(bus_station.route_stations.values_list(
+        'route__id', flat=True,
+    ))]
+    routes = Route.objects.filter(id__in=route_codes)
+    message = render_to_string('bot/bus_station_info.html', dict(
+        bus_station=bus_station,
+        routes=routes,
+    ))
+
+    if bot_type == SOURCE_TELEGRAM:
+            send_markdown_message(bot, chat_id, message)
+    elif bot_type == SOURCE_FACEBOOK:
+        bot.sendMessage(chat_id, message)
+
+    if bus_station.latitude and bus_station.longitude:
+        if bot_type == SOURCE_TELEGRAM:
+            bot.sendLocation(chat_id, bus_station.latitude, bus_station.longitude)
+        elif bot_type == SOURCE_FACEBOOK:
+            bot.sendMessage(chat_id, message)
+            map_image_url = "https://api.mapbox.com/v4/mapbox.streets/pin-s+f44({long},{lat})/{long},{lat},15/300x200.png?access_token={access_token}".format(
+                lat=float(bus_station.latitude),
+                long=float(bus_station.longitude),
+                access_token=settings.MAPBOX_ACCESS_TOKEN,
+            )
+            bot.sendImage(chat_id, map_image_url)
+
+
+def send_nearest_bus_station(bot_type, bot, chat_id, location):
+    bus_station = sitp_utils.get_closest_station(
+        location['latitude'], location['longitude']
+    )
+    send_bus_station_info(bot_type, bot, chat_id, bus_station=bus_station)
+
+
+def send_bus_or_station_info(bot_type, bot, chat_id, message_text):
+    # Check for routes
+    routes = Route.objects.filter(code__iexact=message_text).all()
+    if routes:
+        for route in routes:
+            send_bus_info(bot_type, bot, chat_id, route)
+        return True
+
+    # Check for bus stations
+    bus_station = BusStation.objects.filter(code__iexact=message_text).first()
+    if bus_station:
+        send_bus_station_info(bot_type, bot, chat_id, bus_station)
+        return True
+
+    return False

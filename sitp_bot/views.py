@@ -12,11 +12,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
 from .models import SOURCE_TELEGRAM
-from .utils import save_bot_message, save_bot_user
-from .telegram_bot import (
-    send_help_message, send_bus_or_station_info, send_nearest_bus_station,
-    send_bus_info,
+from .utils import (
+    save_bot_message, save_bot_user, send_bus_or_station_info,
+    send_nearest_bus_station, send_bus_info,
 )
+from .telegram_bot import send_help_message
 from .facebook_bot import received_message as facebook_received_message
 from sitp_scraper.models import Route
 from python_bot_utils.telegram import send_markdown_message
@@ -58,7 +58,7 @@ class TelegramCommandReceiveView(View):
         # If we got user location
         location = payload['message'].get('location')
         if location:
-            send_nearest_bus_station(TelegramBot, chat_id, location)
+            send_nearest_bus_station(SOURCE_TELEGRAM, TelegramBot, chat_id, location)
             return response
 
         message_text = payload['message'].get('text')
@@ -70,17 +70,17 @@ class TelegramCommandReceiveView(View):
         message_text = message_text.lower().strip()
 
         if message_text in ['/start', '/help', '/info']:
-            send_help_message(TelegramBot, chat_id, first_name)
+            send_help_message(SOURCE_TELEGRAM, TelegramBot, chat_id, first_name)
             return response
 
         bus_match = re.fullmatch(r'/bus(\d+)', message_text)
         if bus_match:
             route = Route.objects.filter(id=bus_match.group(1)).first()
-            send_bus_info(TelegramBot, chat_id, route)
+            send_bus_info(SOURCE_TELEGRAM, TelegramBot, chat_id, route)
             return response
 
         # Try to get bus station or route
-        if not send_bus_or_station_info(TelegramBot, chat_id, message_text):
+        if not send_bus_or_station_info(SOURCE_TELEGRAM, TelegramBot, chat_id, message_text):
             send_markdown_message(
                 TelegramBot,
                 chat_id,
