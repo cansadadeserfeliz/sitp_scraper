@@ -1,5 +1,4 @@
-¡Hola, {{ first_name }}! {{ EMOJI_CODES.smiling_face_with_smiling_eyes }}
+¡Hola{% if first_name %}, {{ first_name }}{% endif %}!
 Te puedo ayudar a conocer más información acerca de los buses SITP.
 
-Puedes preguntar por la ruta de bus, usando el siguente comando: /bus, por ejemplo, /bus Z8,
-o encontrar las rutas que pasan por tu parada: /parada 216B00
+Puedes preguntar por la ruta de bus o encontrar las rutas que pasan por tu parada.

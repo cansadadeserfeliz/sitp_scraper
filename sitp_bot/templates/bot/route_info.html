@@ -1,0 +1,4 @@
+:oncoming_bus: *{{ route.code }}* es una ruta {{ route.get_route_type_display }}.
+{% if route.schedule %}:clock10: {{ route.get_schedule_display }}{% endif %}
+
+[Aquí]({{ route.map_link }}) puedes encontrar el mapa de la ruta.

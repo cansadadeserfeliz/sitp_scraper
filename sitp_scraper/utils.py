@@ -8,7 +8,7 @@ from .models import BusStation, Route
 
 
 def get_closest_station(latitude, longitude):
-    distance = 2000  # meters
+    distance = 5000  # meters
     ref_location = Point(longitude, latitude)
 
     return BusStation.objects.filter(
