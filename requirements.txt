@@ -18,5 +18,5 @@ whitenoise==3.2.3
 xlrd==1.0.0
 
 # Python bot utils
-git+ssh://git@github.com/vero4karu/python-bot-utils.git@v0.0.2
+git+ssh://git@github.com/vero4karu/python-bot-utils.git@v0.0.3
 
