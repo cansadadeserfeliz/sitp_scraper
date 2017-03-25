@@ -2,7 +2,10 @@ import logging
 from django.conf import settings
 
 from .models import SOURCE_FACEBOOK
-from .utils import save_bot_user, save_bot_message, send_bus_or_station_info
+from .utils import (
+    save_bot_user, save_bot_message, send_bus_or_station_info,
+    send_nearest_bus_station,
+)
 from sitp_scraper import utils as sitp_utils
 from python_bot_utils.facebook import MessengerBot, QuickReply
 
@@ -72,11 +75,7 @@ def received_message(event):
             elif attachment['type'] == 'file':
                 bot.sendMessage(sender_id, 'Gracias por el archivo ;) {}'.format(attachment['payload']['url']))
             elif attachment['type'] == 'location':
-                latitude = attachment['payload']['coordinates']['lat']
-                longitude = attachment['payload']['coordinates']['long']
-                bus_station = sitp_utils.get_closest_station(latitude, longitude)
-                if bus_station:
-                    bot.sendMessage(sender_id, 'Tu estación es más cercana es {}'.format(bus_station.name))
-                else:
-                    bot.sendMessage(sender_id, 'Estás muy lejos :(')
-
+                send_nearest_bus_station(SOURCE_FACEBOOK, bot, sender_id, {
+                    'latitude': attachment['payload']['coordinates']['lat'],
+                    'longitude': attachment['payload']['coordinates']['long'],
+                })
