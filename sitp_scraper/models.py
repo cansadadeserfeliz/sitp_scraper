@@ -1,3 +1,5 @@
+from ast import literal_eval
+
 from django.db import models
 from django.contrib.gis.db import models as geo_models
 
@@ -85,6 +87,13 @@ class Route(models.Model):
 
     def __str__(self):
         return self.code
+
+    def get_schedule_display(self):
+        try:
+            schedule = literal_eval(self.schedule)
+            return ', '.join(schedule)
+        except:
+            return ''
 
     class Meta:
         ordering = ['code']

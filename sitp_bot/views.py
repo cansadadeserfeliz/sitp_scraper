@@ -12,12 +12,14 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 
 from .models import SOURCE_TELEGRAM
-from .utils import EMOJI_CODES, save_bot_message, save_bot_user
+from .utils import save_bot_message, save_bot_user
 from .telegram_bot import (
-    display_help, send_bus_info, send_nearest_bus_station,
-    send_bus_station_info,
+    send_help_message, send_bus_or_station_info, send_nearest_bus_station,
+    send_bus_info,
 )
 from .facebook_bot import received_message as facebook_received_message
+from sitp_scraper.models import Route
+from python_bot_utils.telegram import send_markdown_message
 
 
 TelegramBot = telepot.Bot(settings.TELEGRAM_TOKEN)
@@ -25,90 +27,66 @@ telegram_logger = logging.getLogger('telegram.bot')
 facebook_logger = logging.getLogger('facebook.bot')
 
 
-class CommandReceiveView(View):
+class TelegramCommandReceiveView(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
-        return super(CommandReceiveView, self).dispatch(request, *args, **kwargs)
+        return super(TelegramCommandReceiveView, self).dispatch(request, *args, **kwargs)
 
     def post(self, request, bot_token):
         if bot_token != settings.TELEGRAM_TOKEN:
             return HttpResponseForbidden('Invalid token')
 
-        raw = request.body.decode('utf-8')
-
         try:
+            raw = request.body.decode('utf-8')
             payload = json.loads(raw)
-            first_name = payload['message']['from'].get('first_name', '')
-            username = payload['message']['from'].get('username', '')
-            user_id = payload['message']['from'].get('id', '')
-            telegram_logger.info(
-                'Bot request from {}'.format(username),
-                extra={'data': payload}
-            )
-            save_bot_user(SOURCE_TELEGRAM, user_id, payload['message']['from'])
+            telegram_logger.info('Telegram Bot request', extra={'data': payload})
         except ValueError:
             return HttpResponseBadRequest('Invalid request body')
+
+        first_name = ''
+
+        # Save bot user
+        if payload['message'].get('from'):
+            first_name = payload['message']['from']['first_name']
+            user_id = payload['message']['from'].get('id', '')
+            save_bot_user(SOURCE_TELEGRAM, user_id, payload['message']['from'])
 
         response = JsonResponse({}, status=200)
         chat_id = payload['message']['chat']['id']
 
+        # If we got user location
         location = payload['message'].get('location')
         if location:
             send_nearest_bus_station(TelegramBot, chat_id, location)
             return response
 
-        text = payload['message'].get('text')
+        message_text = payload['message'].get('text')
 
-        bus_match = re.fullmatch(r'/bus(\d+)', text)
-        if bus_match:
-            send_bus_info(TelegramBot, chat_id, bus_id=bus_match.group(1))
+        if not message_text:
             return response
 
-        cmd = ''
-        if text:
-            save_bot_message(SOURCE_TELEGRAM, text)
-            words = text.split()
-            cmd = words[0].lower()
+        save_bot_message(SOURCE_TELEGRAM, message_text)
+        message_text = message_text.lower().strip()
 
-        if cmd == '/start':
-            TelegramBot.sendMessage(
+        if message_text in ['/start', '/help', '/info']:
+            send_help_message(TelegramBot, chat_id, first_name)
+            return response
+
+        bus_match = re.fullmatch(r'/bus(\d+)', message_text)
+        if bus_match:
+            route = Route.objects.filter(id=bus_match.group(1)).first()
+            send_bus_info(TelegramBot, chat_id, route)
+            return response
+
+        # Try to get bus station or route
+        if not send_bus_or_station_info(TelegramBot, chat_id, message_text):
+            send_markdown_message(
+                TelegramBot,
                 chat_id,
-                display_help(TelegramBot, first_name),
-                parse_mode='Markdown')
-        elif cmd == '/help':
-            TelegramBot.sendMessage(
-                chat_id,
-                display_help(TelegramBot, first_name),
-                parse_mode='Markdown')
-        elif cmd == '/bus':
-            if len(words) != 2:
-                TelegramBot.sendMessage(
-                    chat_id,
-                    'Tienes que escribir el número de la ruta. '
-                    'Por ejemplo, /bus 18-2')
-            else:
-                send_bus_info(TelegramBot, chat_id, words[1]),
-                return response
-        elif cmd == '/parada':
-            if len(words) != 2:
-                TelegramBot.sendMessage(
-                    chat_id,
-                    'Tienes que escribir el número de la parada. \n'
-                    'Por ejemplo, /parada 216B00 \n'
-                    '[Foto](http://www.sitp.gov.co/modulos/Rutas/img/ParaderosPuntoParada.png)',
-                    parse_mode='Markdown',
-                )
-            else:
-                send_bus_station_info(TelegramBot, chat_id, words[1])
-                return response
-        else:
-            TelegramBot.sendMessage(
-                chat_id,
-                'No te entiendo {} '
-                'Escribe /help para saber cómo hablar conmigo'.format(
-                    EMOJI_CODES['confused_face']
-                )
+                'Tienes que escribir el número de bus o de la parada. \n'
+                'Por ejemplo, *18-2* o *033A06* '
+                '[foto](http://www.sitp.gov.co/modulos/Rutas/img/ParaderosPuntoParada.png)',
             )
 
         return response
