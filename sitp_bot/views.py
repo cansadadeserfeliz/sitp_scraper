@@ -70,7 +70,7 @@ class TelegramCommandReceiveView(View):
         message_text = message_text.lower().strip()
 
         if message_text in ['/start', '/help', '/info']:
-            send_help_message(SOURCE_TELEGRAM, TelegramBot, chat_id, first_name)
+            send_help_message(TelegramBot, chat_id, first_name)
             return response
 
         bus_match = re.fullmatch(r'/bus(\d+)', message_text)

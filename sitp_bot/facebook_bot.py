@@ -6,7 +6,6 @@ from .utils import (
     save_bot_user, save_bot_message, send_bus_or_station_info,
     send_nearest_bus_station,
 )
-from sitp_scraper import utils as sitp_utils
 from python_bot_utils.facebook import MessengerBot, QuickReply
 
 logger = logging.getLogger('facebook.bot')
