@@ -10,6 +10,7 @@ from sitp_scraper.models import Route, BusStation
 from sitp_scraper import utils as sitp_utils
 
 from python_bot_utils.telegram import send_markdown_message
+from python_bot_utils.facebook import PostbackButton
 
 
 def get_facebook_user_info(user_id):
@@ -106,15 +107,29 @@ def send_bus_station_info(bot_type, bot, chat_id, bus_station=None):
     ))
 
     if bot_type == SOURCE_TELEGRAM:
-            send_markdown_message(bot, chat_id, message)
+        send_markdown_message(bot, chat_id, message)
     elif bot_type == SOURCE_FACEBOOK:
-        bot.sendMessage(chat_id, message)
+        buttons = []
+        for route in routes:
+            btn = PostbackButton(
+                title='{}: {}'.format(route.code, route.name),
+                payload='bus{}'.format(id),
+            )
+            buttons.append(btn)
+        bot.sendButton(
+            chat_id,
+            ':bus: Parada {code} {name} / {address}'.format(
+                code=bus_station.code,
+                name=bus_station.name,
+                address=bus_station.address,
+            ),
+            buttons
+        )
 
     if bus_station.latitude and bus_station.longitude:
         if bot_type == SOURCE_TELEGRAM:
             bot.sendLocation(chat_id, bus_station.latitude, bus_station.longitude)
         elif bot_type == SOURCE_FACEBOOK:
-            bot.sendMessage(chat_id, message)
             map_image_url = "https://api.mapbox.com/v4/mapbox.streets/pin-s+f44({long},{lat})/{long},{lat},15/300x200.png?access_token={access_token}".format(
                 lat=float(bus_station.latitude),
                 long=float(bus_station.longitude),
