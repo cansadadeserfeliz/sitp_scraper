@@ -10,7 +10,7 @@ ipython==5.1.0
 psycopg2==2.6.2
 raven==5.27.1
 requests==2.11.1
-Scrapy==1.1.2
+Scrapy==1.8.1
 scrapy-djangoitem==1.1.1
 telepot==10.4
 Unipath==1.1
