@@ -2,7 +2,7 @@
 Django==2.2.26
 
 # Libs
-django-debug-toolbar==1.6
+django-debug-toolbar==1.11.1
 django-grappelli==2.8.2
 emoji==0.4.5
 geopy==1.11.0
